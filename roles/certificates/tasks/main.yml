@@ -1,0 +1,116 @@
+---
+- name: Determine IP address of one master
+  shell: "dig {{ groups['nodes'][0] }} +short"
+  register: result
+  failed_when: result.rc != 0 or result.stdout == ""
+
+- set_fact:
+    cluster_public_ip: "{{ result.stdout }}"
+    cluster_public_hostname: "{{ groups['nodes'][0] }}"
+
+- name: Ensure tmp dir for master certificates exists
+  file:
+    state: directory
+    path: ~/.kube-tmp/pki/master
+    mode: 0755
+
+- name: Ensure tmp dir for node certificates exists
+  file:
+    state: directory
+    path: ~/.kube-tmp/pki/node
+    mode: 0755
+
+- name: Ensure tmp dir for etcd certificates exists
+  file:
+    state: directory
+    path: ~/.kube-tmp/pki/etcd
+    mode: 0755
+
+- name: Create openssl config
+  template:
+    src: openssl.conf.j2
+    dest: ~/.kube-tmp/pki/openssl.conf
+
+- name: Generate private keys
+  shell: "openssl ecparam -name secp521r1 -genkey -noout -out ~/.kube-tmp/pki/master/{{ item }}-key.pem"
+  with_items:
+    - ca
+    - apiserver
+    - admin
+    - etcd
+    - service-account
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+
+
+- name: Genereate etcd private keys
+  shell: "openssl ecparam -name secp521r1 -genkey -noout -out ~/.kube-tmp/pki/etcd/{{ item }}-key.pem"
+  with_items:
+    - ca
+    - etcd
+    - peer    
+
+- name: Change file permissions for private keys 
+  file:
+    path: "{{ item }}"
+    mode: 0600
+  with_fileglob:
+    - "~/.kube-tmp/pki/master/*-key.pem"
+
+- name: Change file permissions for etcd private keys 
+  file:
+    path: "{{ item }}"
+    mode: 0600
+  with_fileglob:
+    - "~/.kube-tmp/pki/etcd/*-key.pem"
+
+- name: Generate CA cert
+  shell: "openssl req -x509 -new -sha256 -nodes -key ~/.kube-tmp/pki/master/ca-key.pem -days 1826 -out ~/.kube-tmp/pki/master/ca.pem -subj '/CN=kubernetes-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate etcd CA cert
+  shell: "openssl req -x509 -new -sha256 -nodes -key ~/.kube-tmp/pki/etcd/ca-key.pem -days 1826 -out ~/.kube-tmp/pki/etcd/ca.pem -subj '/CN=etcd-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate apiserver cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/apiserver-key.pem -subj '/CN=kube-apiserver/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/apiserver.pem -days 1826 -extensions v3_req_apiserver -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate admin etcd cert
+  shell: "openssl req -new -key ~/.kube-tmp/pki/master/admin-key.pem -subj '/CN=Kubernetes/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/admin.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate kube-controller-manager cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/kube-controller-manager-key.pem -subj '/CN=kube-controller-manager/C=SE/L=Gothenburg/O=system:kube-controller-manager/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/kube-controller-manager.pem -days 365 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate kube-scheduler cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/kube-scheduler-key.pem -subj '/CN=system:kube-scheduler/C=SE/L=Gothenburg/O=system:kube-scheduler/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/kube-scheduler.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate kube-proxy cert 
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/kube-proxy-key.pem -subj '/CN=system:kube-proxy/C=SE/L=Gothenburg/O=system:node-proxier/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/kube-proxy.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate service-account cert 
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/service-account-key.pem -subj '/CN=service-accounts/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/service-account.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate etcd cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/etcd/etcd-key.pem -subj '/CN=etcd/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/etcd/ca.pem -CAkey ~/.kube-tmp/pki/etcd/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/etcd/etcd.pem -days 1826 -extensions v3_req_etcd -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate etcd-peer cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/etcd/peer-key.pem -subj '/CN=etcd-peer/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/etcd/ca.pem -CAkey ~/.kube-tmp/pki/etcd/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/etcd/peer.pem -days 1826 -extensions v3_req_etcd -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate node private keys
+  shell: "openssl ecparam -name secp521r1 -genkey -noout -out ~/.kube-tmp/pki/node/system:node:{{ item }}-key.pem"
+  with_items: "{{ groups['nodes'] }}"
+
+- name: Generate node certs
+  shell: openssl req -new -key ~/.kube-tmp/pki/node/system:node:{{ item }}-key.pem -subj '/CN=system:node:{{ hostvars[item].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/node/system:node:{{ item }}.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf
+  with_items: "{{ groups['nodes'] }}"
+
+- name: Create admin kubeconfig
+  shell: "kubectl config set-cluster blackbox --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_public_hostname }}:6443 --kubeconfig ~/.kube/config"
+
+- name: set-credentials 
+  shell: "kubectl config set-credentials blackbox --client-certificate ~/.kube-tmp/pki/master/admin.pem --client-key ~/.kube-tmp/pki/master/admin-key.pem --embed-certs=true --kubeconfig ~/.kube/config"
+
+- name: set-context 
+  shell: "kubectl config set-context blackbox --cluster=blackbox --user=blackbox --kubeconfig ~/.kube/config"
+
+- name: use-context 
+  shell: "kubectl config use-context blackbox --kubeconfig ~/.kube/config"

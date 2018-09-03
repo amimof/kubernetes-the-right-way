@@ -1,0 +1,77 @@
+- hosts: nodes
+  tasks:
+  - name: Stop kubelet
+    systemd:
+      name: kubelet
+      state: stopped
+      enabled: False
+
+  - name: Stop containers
+    shell: docker stop $(docker ps -q)
+    ignore_errors: True
+
+  - name: Remove /var/lib/kubelet
+    file:
+      path: /etc/kubernetes
+      state: absent
+
+  - name: Remove binaries
+    file:
+      path: "/usr/local/bin/{{ item }}"
+      state: absent
+    with_items:
+      - kubelet
+
+- hosts: etcd
+  tasks:
+  - name: Stop etcd
+    systemd:
+      name: etcd
+      state: stopped
+      enabled: False
+
+  - name: Remove /var/lib/etcd
+    file:
+      path: /etc/etcd
+      state: absent
+
+  - name: Remove binaries
+    file:
+      path: "/usr/local/bin/{{ item }}"
+      state: absent
+    with_items:
+      - etcd      
+
+- hosts: masters
+  tasks:
+  - name: Stop services
+    systemd:
+      name: "{{ item }}"
+      state: stopped
+      enabled: False
+    with_items:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+
+  - name: Remove /etc/kubernetes
+    file:
+      path: /etc/kubernetes
+      state: absent
+
+  - name: Remove binaries
+    file:
+      path: "/usr/local/bin/{{ item }}"
+      state: absent
+    with_items:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: Remove tmp cert dir
+    file:
+      path: ~/.kube-tmp/
+      state: absent

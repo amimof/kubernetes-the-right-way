@@ -1,0 +1,26 @@
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+ 
+[Service]
+ExecStart=/usr/local/bin/kubelet \
+  --allow-privileged=true \
+  --anonymous-auth=false \
+  --authorization-mode=Webhook \
+  --client-ca-file=/etc/kubernetes/pki/ca.pem \
+  --cluster-dns=10.32.0.10 \
+  --cluster-domain=cluster.local \
+  --image-pull-progress-deadline=2m \
+  --kubeconfig=/etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig \
+  --register-node=true \
+  --runtime-request-timeout=15m \
+  --tls-cert-file=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}.pem \
+  --tls-private-key-file=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}-key.pem \
+  --fail-swap-on=false --v=2 \
+  --pod-manifest-path=/etc/kubernetes/manifest \
+  --v=2
+Restart=on-failure
+RestartSec=5
+ 
+[Install]
+WantedBy=multi-user.target

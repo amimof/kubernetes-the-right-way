@@ -1,0 +1,19 @@
+- hosts: localhost
+  connection: local
+  roles:
+    - tools
+    - certificates
+
+- hosts: etcd
+  roles:
+    - etcd
+
+- hosts: masters
+  roles:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- hosts: nodes
+  roles:
+    - kubelet

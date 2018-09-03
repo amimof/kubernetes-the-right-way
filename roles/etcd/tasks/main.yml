@@ -1,0 +1,45 @@
+- name: Download etcd
+  get_url:
+    url: https://github.com/coreos/etcd/releases/download/v3.3.5/etcd-v3.3.5-linux-amd64.tar.gz
+    dest: /tmp/etcd-v3.3.5-linux-amd64.tar.gz
+
+- name: Unarchive etcd tarball
+  unarchive:
+    src: /tmp/etcd-v3.3.5-linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: True
+
+- name: Move etcd binaries into place
+  copy:
+    src: "/tmp/etcd-v3.3.5-linux-amd64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    remote_src: True
+  with_items:
+    - etcd
+    - etcdctl
+    
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: /etc/etcd/pki
+    mode: 0755
+
+- name: Copy certificates
+  copy:
+    src: ~/.kube-tmp/pki/etcd/
+    dest: /etc/etcd/pki
+
+- name: Copy etcd.service unit file
+  template:
+    src: etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable etcd
+  systemd:
+    name: etcd
+    state: restarted
+    enabled: True

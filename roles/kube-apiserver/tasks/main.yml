@@ -1,0 +1,63 @@
+- name: Download kube-apiserver
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-apiserver
+    dest: /usr/local/bin/kube-apiserver
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/kubernetes/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+    - config
+
+- name: Copy certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/kubernetes/pki
+  with_items:
+    - "~/.kube-tmp/pki/master/ca.pem"
+    - "~/.kube-tmp/pki/master/service-account-key.pem"
+    - "~/.kube-tmp/pki/master/apiserver.pem"
+    - "~/.kube-tmp/pki/master/apiserver-key.pem"
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/etcd/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+
+- name: Copy etcd certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/etcd/pki
+  with_items:
+    - "~/.kube-tmp/pki/etcd/ca.pem"
+    - "~/.kube-tmp/pki/etcd/etcd.pem"
+    - "~/.kube-tmp/pki/etcd/etcd-key.pem"
+
+- name: Copy encryption-config
+  copy:
+    src: encryption-config.yml
+    dest: /etc/kubernetes/config
+
+- name: Copy kube-apiserver.service unit file
+  template:
+    src: kube-apiserver.service.j2
+    dest: /etc/systemd/system/kube-apiserver.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable kube-apiserver
+  systemd:
+    name: kube-apiserver
+    state: restarted
+    enabled: True

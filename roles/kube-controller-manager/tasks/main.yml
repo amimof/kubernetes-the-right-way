@@ -1,0 +1,54 @@
+- name: Download kube-controller-manager
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-controller-manager
+    dest: /usr/local/bin/kube-controller-manager
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/kubernetes/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+    - config
+
+- name: Copy certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/kubernetes/pki
+  with_items:
+    - "~/.kube-tmp/pki/master/ca.pem"
+    - "~/.kube-tmp/pki/master/ca-key.pem"
+    - "~/.kube-tmp/pki/master/kube-controller-manager.pem"
+    - "~/.kube-tmp/pki/master/kube-controller-manager-key.pem"
+    - "~/.kube-tmp/pki/master/service-account-key.pem"
+
+- name: Create controller-manager kubeconfig
+  shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+
+- name: set-credentials 
+  shell: "kubectl config set-credentials system:kube-controller-manager --client-certificate=/etc/kubernetes/pki/kube-controller-manager.pem --client-key=/etc/kubernetes/pki/kube-controller-manager-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+
+- name: set-context 
+  shell: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+
+- name: use-context 
+  shell: "kubectl config use-context default --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+
+- name: Copy kube-controller-manager.service unit file
+  template:
+    src: kube-controller-manager.service.j2
+    dest: /etc/systemd/system/kube-controller-manager.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable kube-controller-manager
+  systemd:
+    name: kube-controller-manager
+    state: restarted
+    enabled: True

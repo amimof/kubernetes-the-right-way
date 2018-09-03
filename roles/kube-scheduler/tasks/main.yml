@@ -1,0 +1,57 @@
+- name: Download kube-scheduler
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-scheduler
+    dest: /usr/local/bin/kube-scheduler
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/kubernetes/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+    - config
+
+- name: Copy certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/kubernetes/pki
+  with_items:
+    - "~/.kube-tmp/pki/master/ca.pem"
+    - "~/.kube-tmp/pki/master/kube-scheduler.pem"
+    - "~/.kube-tmp/pki/master/kube-scheduler-key.pem"
+
+- name: Copy scheduler config
+  copy:
+    src: kube-scheduler.yml
+    dest: /etc/kubernetes/config/
+
+- name: Create kube-scheduler kubeconfig
+  shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+
+- name: set-credentials 
+  shell: "kubectl config set-credentials system:kube-scheduler --client-certificate=/etc/kubernetes/pki/kube-scheduler.pem --client-key=/etc/kubernetes/pki/kube-scheduler-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+
+- name: set-context 
+  shell: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+
+- name: use-context 
+  shell: "kubectl config use-context default --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+
+- name: Copy kube-scheduler.service unit file
+  template:
+    src: kube-scheduler.service.j2
+    dest: /etc/systemd/system/kube-scheduler.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable kube-scheduler
+  systemd:
+    name: kube-scheduler
+    state: restarted
+    enabled: True

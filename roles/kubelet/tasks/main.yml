@@ -1,0 +1,51 @@
+- name: Download kubelet
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubelet
+    dest: /usr/local/bin/kubelet
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/kubernetes/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+    - config
+
+- name: Copy certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/kubernetes/pki
+  with_fileglob:
+    - "~/.kube-tmp/pki/node/system:node:{{ ansible_fqdn }}*"
+    - "~/.kube-tmp/pki/master/ca.pem"
+
+- name: Create kubelet kubeconfig
+  shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://blackbox.amimof.com:6443 --kubeconfig=/etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig"
+
+- name: set-credentials 
+  shell: "kubectl config set-credentials system:node:{{ ansible_hostname }} --client-certificate=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}.pem --client-key=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig"
+ 
+- name: set-context
+  shell: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ ansible_hostname }} --kubeconfig=/etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig"
+ 
+- name: use-context
+  shell: "kubectl config use-context default --kubeconfig=/etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig"
+
+- name: Copy kubelet.service unit file
+  template:
+    src: kubelet.service.j2
+    dest: /etc/systemd/system/kubelet.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable kubelet
+  systemd:
+    name: kubelet
+    state: restarted
+    enabled: True
