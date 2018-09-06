@@ -1,6 +1,6 @@
 - name: Download kube-scheduler
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-scheduler
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kube-scheduler
     dest: /usr/local/bin/kube-scheduler
     mode: 0755
     owner: root

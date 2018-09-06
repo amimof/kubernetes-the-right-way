@@ -1,6 +1,6 @@
 - name: Download kube-controller-manager
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-controller-manager
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kube-controller-manager
     dest: /usr/local/bin/kube-controller-manager
     mode: 0755
     owner: root

@@ -17,9 +17,21 @@
       path: /etc/systemd/system/kubelet.service
       state: absent
 
-  - name: Stop containers
-    shell: docker stop $(docker ps -q)
-    ignore_errors: True
+  - stat:
+      path: /etc/systemd/system/kube-proxy.service
+    register: result
+  
+  - name: Stop kube-proxy
+    systemd:
+      name: kube-proxy
+      state: stopped
+      enabled: False
+    when: result.stat.exists
+
+  - name: Remove unit file
+    file:
+      path: /etc/systemd/system/kube-proxy.service
+      state: absent
 
   - name: Remove directories
     file:
@@ -67,7 +79,7 @@
       path: "/usr/local/bin/{{ item }}"
       state: absent
     with_items:
-      - etcd      
+      - etcd   
 
 - hosts: masters
   tasks:

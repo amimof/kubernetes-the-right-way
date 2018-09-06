@@ -1,0 +1,69 @@
+---
+- name: Determine IP address of one master
+  shell: "dig {{ groups['nodes'][0] }} +short"
+  register: result
+  failed_when: result.rc != 0 or result.stdout == ""
+  delegate_to: 127.0.0.1
+
+- set_fact:
+    cluster_ip: "{{ cluster_ip | default(result.stdout) }}"
+    cluster_hostname: "{{ cluster_hostname | default(groups['nodes'][0]) }}"
+    cluster_port: "{{ cluster_port | default('6443') }}"
+
+- name: Download kube-proxy
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kube-proxy
+    dest: /usr/local/bin/kube-proxy
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "/etc/kubernetes/{{ item }}"
+    mode: 0755
+  with_items:
+    - pki
+    - config
+
+- name: Create kube-proxy kubeconfig
+  command: "kubectl config set-cluster kubernetes --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: set-credentials 
+  command: "kubectl config set-credentials system:kube-proxy --client-certificate ~/.kube-tmp/pki/master/kube-proxy.pem --client-key ~/.kube-tmp/pki/master/kube-proxy-key.pem --embed-certs=true --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  delegate_to: 127.0.0.1
+ 
+- name: set-context
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-proxy --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  delegate_to: 127.0.0.1
+ 
+- name: use-context
+  command: "kubectl config use-context default --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: Copy kubeconfig
+  copy:
+    src: ~/.kube-tmp/kube-proxy.kubeconfig
+    dest: /etc/kubernetes/config/kube-proxy.kubeconfig
+
+- name: Copy kube-proxy config
+  copy:
+    src: kube-proxy.yml
+    dest: /etc/kubernetes/config/
+
+- name: Copy kubelet.service unit file
+  template:
+    src: kube-proxy.service.j2
+    dest: /etc/systemd/system/kube-proxy.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable kubelet
+  systemd:
+    name: kube-proxy
+    state: restarted
+    enabled: True

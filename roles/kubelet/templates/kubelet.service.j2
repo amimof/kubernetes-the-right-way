@@ -16,8 +16,7 @@ ExecStart=/usr/local/bin/kubelet \
   --runtime-request-timeout=15m \
   --tls-cert-file=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}.pem \
   --tls-private-key-file=/etc/kubernetes/pki/system:node:{{ ansible_fqdn }}-key.pem \
-  --fail-swap-on=false --v=2 \
-  --pod-manifest-path=/etc/kubernetes/manifest \
+  --fail-swap-on=false \
   --v=2
 Restart=on-failure
 RestartSec=5

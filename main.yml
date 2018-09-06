@@ -16,4 +16,5 @@
 
 - hosts: nodes
   roles:
+    - kube-proxy
     - kubelet

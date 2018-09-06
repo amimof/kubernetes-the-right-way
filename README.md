@@ -1,6 +1,6 @@
 # Kubernetes The Right Way
 
-Install a Kubernetes cluster with Ansible on any infrastructure. The goal is to provide an automated provisioning method but still provide control over underlying infrastrucute components. For that reason, this project will not install components such as a container runtime, container network, storage plugins etc. It is up to you to prepare your hosts.
+Install a Kubernetes cluster with Ansible on any infrastructure. The goal is to provide an automated provisioning method but still provide control over underlying components. For that reason, this project will not install components such as a container runtime, container network, storage plugins etc. It is up to you to prepare your hosts.
 
 After a successfull install you will have a cluster with:
 * one or more etcd instances

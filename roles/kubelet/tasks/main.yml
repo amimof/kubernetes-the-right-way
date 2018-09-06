@@ -11,7 +11,7 @@
 
 - name: Download kubelet
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubelet
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubelet
     dest: /usr/local/bin/kubelet
     mode: 0755
     owner: root
