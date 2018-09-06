@@ -30,16 +30,25 @@
     dest: /etc/kubernetes/config/
 
 - name: Create kube-scheduler kubeconfig
-  shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig ~/.kube-tmp/kube-scheduler.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  shell: "kubectl config set-credentials system:kube-scheduler --client-certificate=/etc/kubernetes/pki/kube-scheduler.pem --client-key=/etc/kubernetes/pki/kube-scheduler-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+  command: "kubectl config set-credentials system:kube-scheduler --client-certificate ~/.kube-tmp/pki/master/kube-scheduler.pem --client-key ~/.kube-tmp/pki/master/kube-scheduler-key.pem --embed-certs=true --kubeconfig ~/.kube-tmp/kube-scheduler.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: set-context 
-  shell: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig ~/.kube-tmp/kube-scheduler.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: use-context 
-  shell: "kubectl config use-context default --kubeconfig=/etc/kubernetes/config/kube-scheduler.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig ~/.kube-tmp/kube-scheduler.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: Copy kubeconfig
+  copy:
+    src: ~/.kube-tmp/kube-scheduler.kubeconfig
+    dest: /etc/kubernetes/config/kube-scheduler.kubeconfig
 
 - name: Copy kube-scheduler.service unit file
   template:

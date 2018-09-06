@@ -1,19 +1,33 @@
 - hosts: nodes
   tasks:
+
+  - stat:
+      path: /etc/systemd/system/kubelet.service
+    register: result
+  
   - name: Stop kubelet
     systemd:
       name: kubelet
       state: stopped
       enabled: False
+    when: result.stat.exists
+
+  - name: Remove unit file
+    file:
+      path: /etc/systemd/system/kubelet.service
+      state: absent
 
   - name: Stop containers
     shell: docker stop $(docker ps -q)
     ignore_errors: True
 
-  - name: Remove /var/lib/kubelet
+  - name: Remove directories
     file:
-      path: /etc/kubernetes
+      path: "{{ item }}"
       state: absent
+    with_items:
+      - /var/lib/kubelet
+      - /etc/kubernetes
 
   - name: Remove binaries
     file:
@@ -24,16 +38,29 @@
 
 - hosts: etcd
   tasks:
+  - stat:
+      path: /etc/systemd/system/etcd.service
+    register: result
+
   - name: Stop etcd
     systemd:
       name: etcd
       state: stopped
       enabled: False
+    when: result.stat.exists
 
-  - name: Remove /var/lib/etcd
+  - name: Remove unit file
     file:
-      path: /etc/etcd
+      path: /etc/systemd/system/etcd.service
       state: absent
+
+  - name: Remove etcd directories
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /var/lib/etcd
+      - /etc/etcd
 
   - name: Remove binaries
     file:
@@ -44,20 +71,45 @@
 
 - hosts: masters
   tasks:
-  - name: Stop services
+  - stat: 
+      path: "/etc/systemd/system/kube-controller-manager.service"
+    register: result
+
+  - name: Stop kube-controller-manager service
     systemd:
-      name: "{{ item }}"
+      name: kube-controller-manager
       state: stopped
       enabled: False
-    with_items:
-      - kube-apiserver
-      - kube-controller-manager
-      - kube-scheduler
+    when: result.stat.exists
 
-  - name: Remove /etc/kubernetes
+  - stat: 
+      path: "/etc/systemd/system/kube-scheduler.service"
+    register: result
+
+  - name: Stop kube-scheduler service
+    systemd:
+      name: kube-scheduler
+      state: stopped
+      enabled: False
+    when: result.stat.exists
+
+  - stat: 
+      path: "/etc/systemd/system/kube-apiserver.service"
+    register: result
+
+  - name: Stop kube-apiserver service
+    systemd:
+      name: kube-apiserver
+      state: stopped
+      enabled: False
+    when: result.stat.exists
+
+  - name: Remove directories
     file:
-      path: /etc/kubernetes
+      path: "{( item }}"
       state: absent
+    with_items:
+      - /etc/kubernetes
 
   - name: Remove binaries
     file:

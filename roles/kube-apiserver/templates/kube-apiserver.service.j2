@@ -13,6 +13,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --audit-log-path=/var/log/audit.log \
   --authorization-mode=Node,RBAC \
   --bind-address=0.0.0.0 \
+  --secure-port={{ cluster_port }} \
   --client-ca-file=/etc/kubernetes/pki/ca.pem \
   --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --enable-swagger-ui=true \

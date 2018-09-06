@@ -27,16 +27,25 @@
     - "~/.kube-tmp/pki/master/service-account-key.pem"
 
 - name: Create controller-manager kubeconfig
-  shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  shell: "kubectl config set-credentials system:kube-controller-manager --client-certificate=/etc/kubernetes/pki/kube-controller-manager.pem --client-key=/etc/kubernetes/pki/kube-controller-manager-key.pem --embed-certs=true --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-credentials system:kube-controller-manager --client-certificate ~/.kube-tmp/pki/master/kube-controller-manager.pem --client-key ~/.kube-tmp/pki/master/kube-controller-manager-key.pem --embed-certs=true --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: set-context 
-  shell: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  delegate_to: 127.0.0.1
 
 - name: use-context 
-  shell: "kubectl config use-context default --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: Copy kubeconfig
+  copy:
+    src: ~/.kube-tmp/kube-controller-manager.kubeconfig
+    dest: /etc/kubernetes/config/kube-controller-manager.kubeconfig
 
 - name: Copy kube-controller-manager.service unit file
   template:

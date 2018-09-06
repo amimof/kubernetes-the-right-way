@@ -2,6 +2,9 @@
   get_url:
     url: https://github.com/coreos/etcd/releases/download/v3.3.5/etcd-v3.3.5-linux-amd64.tar.gz
     dest: /tmp/etcd-v3.3.5-linux-amd64.tar.gz
+    mode: 0755
+    owner: root
+    group: root
 
 - name: Unarchive etcd tarball
   unarchive:
@@ -14,6 +17,16 @@
     src: "/tmp/etcd-v3.3.5-linux-amd64/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     remote_src: True
+  with_items:
+    - etcd
+    - etcdctl
+
+- name: Make etcd binaries executable
+  file:
+    path: "/usr/local/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
   with_items:
     - etcd
     - etcdctl
