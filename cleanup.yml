@@ -2,6 +2,22 @@
   tasks:
 
   - stat:
+      path: /etc/systemd/system/containerd.service
+    register: result
+
+  - name: Stop containerd
+    systemd:
+      name: containerd
+      state: stopped
+      enabled: False
+    when: result.stat.exists
+
+  - name: Remove unit file
+    file:
+      path: /etc/systemd/system/containerd.service
+      state: absent
+
+  - stat:
       path: /etc/systemd/system/kubelet.service
     register: result
   
@@ -40,12 +56,21 @@
     with_items:
       - /var/lib/kubelet
       - /etc/kubernetes
+      - /etc/containerd
+      - /etc/cni
+      - /opt/cni
 
   - name: Remove binaries
     file:
       path: "/usr/local/bin/{{ item }}"
       state: absent
     with_items:
+      - ctr
+      - containerd
+      - containerd-shim
+      - containerd-release
+      - containerd-stress
+      - runc
       - kubelet
 
 - hosts: etcd

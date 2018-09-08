@@ -1,25 +1,33 @@
 - name: Download etcd
   get_url:
     url: https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz
-    dest: /tmp/etcd-v3.3.5-linux-amd64.tar.gz
+    dest: /tmp/etcd-v3.3.9-linux-amd64.tar.gz
     mode: 0755
     owner: root
     group: root
 
 - name: Unarchive etcd tarball
   unarchive:
-    src: /tmp/etcd-v3.3.5-linux-amd64.tar.gz
+    src: /tmp/etcd-v3.3.9-linux-amd64.tar.gz
     dest: /tmp
     remote_src: True
 
 - name: Move etcd binaries into place
   copy:
-    src: "/tmp/etcd-v3.3.5-linux-amd64/{{ item }}"
+    src: "/tmp/etcd-v3.3.9-linux-amd64/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     remote_src: True
   with_items:
     - etcd
     - etcdctl
+
+- name: Remove tmp download files
+  file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  with_items:
+    - etcd-v3.3.9-linux-amd64
+    - etcd-v3.3.9-linux-amd64.tar.gz
 
 - name: Make etcd binaries executable
   file:

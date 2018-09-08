@@ -1,0 +1,34 @@
+---
+- name: Ensure directories exist
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: 0755
+  with_items:
+    - /etc/containerd
+
+- name: Download containerd
+  unarchive:
+    src: https://github.com/containerd/containerd/releases/download/v1.1.3/containerd-1.1.3.linux-amd64.tar.gz
+    dest: /usr/local/
+    remote_src: True
+
+- name: Create configuration
+  template:
+    src: config.toml.j2
+    dest: /etc/containerd/config.toml
+
+- name: Copy containerd.service unit file
+  template:
+    src: containerd.service.j2
+    dest: /etc/systemd/system/containerd.service
+
+- name: daemon-reload
+  systemd: 
+    daemon_reload: True
+
+- name: Start and enable containerd
+  systemd:
+    name: containerd
+    state: restarted
+    enabled: True

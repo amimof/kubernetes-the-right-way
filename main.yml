@@ -16,5 +16,8 @@
 
 - hosts: nodes
   roles:
+    - cni
+    - containerd
+    - runc
     - kube-proxy
     - kubelet

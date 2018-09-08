@@ -1,8 +1,11 @@
 # Kubernetes The Right Way
 
-Install a Kubernetes cluster with Ansible on any infrastructure. The goal is to provide an automated provisioning method but still provide control over underlying components. For that reason, this project will not install components such as a container runtime, container network, storage plugins etc. It is up to you to prepare your hosts.
+Install a Kubernetes cluster with Ansible on any infrastructure. Have a production ready provisioned cluster in no time!
 
 After a successfull install you will have a cluster with:
+* [containerd](https://github.com/containerd/containerd) as container runtime
+* [runc](https://github.com/opencontainers/runc) for managing containers
+* [cni](https://github.com/containernetworking/cni) plugins
 * one or more etcd instances
 * one or more masters (kube-api, kube-controller-manager, kube-scheduler) installed as services managed by systemd.
 * one or more nodes (kubelet)
@@ -19,7 +22,6 @@ On the control host
 On each host in the cluster
 * Python 2.7
 * ca-certificates
-* Docker
 
 # Example
 Configure an Ansible inventory file with the host groups `etcd`, `masters` and `nodes` and assign any host to their groups. Following inventory will install all components on a single host:

@@ -1,7 +1,7 @@
 - name: Determine IP address of one master
   shell: "dig {{ groups['nodes'][0] }} +short"
   register: result
-  failed_when: result.rc != 0 or result.stdout == ""
+  failed_when: (result.rc != 0 or result.stdout == "") and cluster_ip is undefined
   delegate_to: 127.0.0.1
 
 - set_fact:
