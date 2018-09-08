@@ -50,7 +50,7 @@
     src: encryption-config.yml
     dest: /etc/kubernetes/config
 
-- name: Copy kube-apiserver.service unit file
+- name: Create systemd unit file
   template:
     src: kube-apiserver.service.j2
     dest: /etc/systemd/system/kube-apiserver.service

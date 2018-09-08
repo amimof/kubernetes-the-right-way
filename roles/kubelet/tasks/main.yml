@@ -55,7 +55,7 @@
     src: "~/.kube-tmp/system:node:{{ ansible_fqdn }}.kubeconfig"
     dest: /etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig
 
-- name: Copy kubelet.service unit file
+- name: Create systemd unit file
   template:
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service

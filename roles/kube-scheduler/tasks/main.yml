@@ -50,7 +50,7 @@
     src: ~/.kube-tmp/kube-scheduler.kubeconfig
     dest: /etc/kubernetes/config/kube-scheduler.kubeconfig
 
-- name: Copy kube-scheduler.service unit file
+- name: Create systemd unit file
   template:
     src: kube-scheduler.service.j2
     dest: /etc/systemd/system/kube-scheduler.service

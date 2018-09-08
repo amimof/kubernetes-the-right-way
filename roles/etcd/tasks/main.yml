@@ -50,7 +50,7 @@
     src: ~/.kube-tmp/pki/etcd/
     dest: /etc/etcd/pki
 
-- name: Copy etcd.service unit file
+- name: Create systemd unit file
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service

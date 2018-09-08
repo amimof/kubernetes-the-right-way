@@ -53,7 +53,7 @@
     src: kube-proxy.yml
     dest: /etc/kubernetes/config/
 
-- name: Copy kubelet.service unit file
+- name: Create systemd unit file
   template:
     src: kube-proxy.service.j2
     dest: /etc/systemd/system/kube-proxy.service
@@ -62,7 +62,7 @@
   systemd: 
     daemon_reload: True
 
-- name: Start and enable kubelet
+- name: Start and enable kube-proxy
   systemd:
     name: kube-proxy
     state: restarted

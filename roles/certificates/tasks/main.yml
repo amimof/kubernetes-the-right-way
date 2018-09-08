@@ -2,7 +2,6 @@
 - name: Determine IP address of one master
   shell: "dig {{ groups['nodes'][0] }} +short"
   register: result
-  failed_when: (result.rc != 0 or result.stdout == "") and cluster_ip is undefined
   delegate_to: 127.0.0.1
 
 - set_fact:
@@ -32,7 +31,6 @@
   openssl_privatekey:
     path: "~/.kube-tmp/pki/{{ item }}-key.pem"
     size: 2048
-    #  secp521r1
   with_items:
     - master/ca
     - master/apiserver
@@ -99,6 +97,8 @@
 - name: Generate node certs
   shell: "openssl req -new -key ~/.kube-tmp/pki/node/system:node:{{ item }}-key.pem -subj '/CN=system:node:{{ hostvars[item].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/node/system:node:{{ item }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item].inventory_hostname_short }},DNS.2:{{ hostvars[item].inventory_hostname }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth')"
   with_items: "{{ groups['nodes'] }}"
+  args:
+    executable: /bin/bash
 
 - name: Create admin kubeconfig
   shell: "kubectl config set-cluster {{ cluster_name }} --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig ~/.kube/config"

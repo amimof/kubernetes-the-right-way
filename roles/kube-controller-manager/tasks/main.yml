@@ -47,7 +47,7 @@
     src: ~/.kube-tmp/kube-controller-manager.kubeconfig
     dest: /etc/kubernetes/config/kube-controller-manager.kubeconfig
 
-- name: Copy kube-controller-manager.service unit file
+- name: Create systemd unit file
   template:
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service

@@ -18,7 +18,7 @@
     src: config.toml.j2
     dest: /etc/containerd/config.toml
 
-- name: Copy containerd.service unit file
+- name: Create systemd unit file
   template:
     src: containerd.service.j2
     dest: /etc/systemd/system/containerd.service
