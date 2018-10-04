@@ -40,6 +40,7 @@
     - master/kube-controller-manager
     - master/kube-scheduler
     - master/kube-proxy
+    - master/kubelet-peer
     - etcd/ca
     - etcd/etcd
     - etcd/peer     
@@ -67,7 +68,10 @@
 - name: Generate apiserver cert
   shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/apiserver-key.pem -subj '/CN=kube-apiserver/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/apiserver.pem -days 1826 -extensions v3_req_apiserver -extfile ~/.kube-tmp/pki/openssl.conf"
 
-- name: Generate admin etcd cert
+- name: Generate kubelet-peer cert
+  shell: "openssl req -new -sha256 -key ~/.kube-tmp/pki/master/kubelet-peer-key.pem -subj '/CN=kubelet-peer/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/kubelet-peer.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
+
+- name: Generate admin cert
   shell: "openssl req -new -key ~/.kube-tmp/pki/master/admin-key.pem -subj '/CN=Kubernetes/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/master/admin.pem -days 1826 -extensions v3_req_client -extfile ~/.kube-tmp/pki/openssl.conf"
 
 - name: Generate kube-controller-manager cert
@@ -95,7 +99,7 @@
   with_items: "{{ groups['nodes'] }}"
 
 - name: Generate node certs
-  shell: "openssl req -new -key ~/.kube-tmp/pki/node/system:node:{{ item }}-key.pem -subj '/CN=system:node:{{ hostvars[item].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/node/system:node:{{ item }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item].inventory_hostname_short }},DNS.2:{{ hostvars[item].inventory_hostname }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth')"
+  shell: "openssl req -new -key ~/.kube-tmp/pki/node/system:node:{{ item }}-key.pem -subj '/CN=system:node:{{ hostvars[item].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA ~/.kube-tmp/pki/master/ca.pem -CAkey ~/.kube-tmp/pki/master/ca-key.pem -CAcreateserial -out ~/.kube-tmp/pki/node/system:node:{{ item }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item].inventory_hostname_short }},DNS.2:{{ hostvars[item].inventory_hostname }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
   with_items: "{{ groups['nodes'] }}"
   args:
     executable: /bin/bash

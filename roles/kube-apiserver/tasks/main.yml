@@ -27,6 +27,8 @@
     - "~/.kube-tmp/pki/master/service-account-key.pem"
     - "~/.kube-tmp/pki/master/apiserver.pem"
     - "~/.kube-tmp/pki/master/apiserver-key.pem"
+    - "~/.kube-tmp/pki/master/kubelet-peer.pem"
+    - "~/.kube-tmp/pki/master/kubelet-peer-key.pem"
 
 - name: Ensure directories exist
   file:
