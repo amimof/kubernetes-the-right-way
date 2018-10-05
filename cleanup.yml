@@ -1,6 +1,14 @@
 - hosts: nodes
   tasks:
 
+  - name: Stop any running containers
+    shell: "for container in $(runc --root /run/containerd/runc/k8s.io/ list | awk '{print $1}' | grep -v ID); do runc --root /run/containerd/runc/k8s.io/ kill $container; done"
+    ignore_errors: True
+
+  - name: Delete all containers
+    shell: "for container in $(runc --root /run/containerd/runc/k8s.io/ list | awk '{print $1}' | grep -v ID); do runc --root /run/containerd/runc/k8s.io/ delete $container; done"
+    ignore_errors: True
+
   - stat:
       path: /etc/systemd/system/containerd.service
     register: result
