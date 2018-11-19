@@ -20,31 +20,31 @@
     src: "{{ item }}"
     dest: /etc/kubernetes/pki
   with_items:
-    - "~/.kube-tmp/pki/master/ca.pem"
-    - "~/.kube-tmp/pki/master/ca-key.pem"
-    - "~/.kube-tmp/pki/master/kube-controller-manager.pem"
-    - "~/.kube-tmp/pki/master/kube-controller-manager-key.pem"
-    - "~/.kube-tmp/pki/master/service-account-key.pem"
+    - "{{ cluster_config_path }}/pki/master/ca.pem"
+    - "{{ cluster_config_path }}/pki/master/ca-key.pem"
+    - "{{ cluster_config_path }}/pki/master/kube-controller-manager.pem"
+    - "{{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem"
+    - "{{ cluster_config_path }}/pki/master/service-account-key.pem"
 
 - name: Create controller-manager kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:kube-controller-manager --client-certificate ~/.kube-tmp/pki/master/kube-controller-manager.pem --client-key ~/.kube-tmp/pki/master/kube-controller-manager-key.pem --embed-certs=true --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-credentials system:kube-controller-manager --client-certificate {{ cluster_config_path }}/pki/master/kube-controller-manager.pem --client-key {{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: set-context 
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: use-context 
-  command: "kubectl config use-context default --kubeconfig ~/.kube-tmp/kube-controller-manager.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig
   copy:
-    src: ~/.kube-tmp/kube-controller-manager.kubeconfig
+    src: "{{ cluster_config_path }}/kube-controller-manager.kubeconfig"
     dest: /etc/kubernetes/config/kube-controller-manager.kubeconfig
 
 - name: Create systemd unit file

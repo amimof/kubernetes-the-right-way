@@ -28,24 +28,24 @@
     - config
 
 - name: Create kube-proxy kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority ~/.kube-tmp/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig {{ cluster_config_path }}/kube-proxy.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:kube-proxy --client-certificate ~/.kube-tmp/pki/master/kube-proxy.pem --client-key ~/.kube-tmp/pki/master/kube-proxy-key.pem --embed-certs=true --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  command: "kubectl config set-credentials system:kube-proxy --client-certificate {{ cluster_config_path }}/pki/master/kube-proxy.pem --client-key {{ cluster_config_path }}/pki/master/kube-proxy-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/kube-proxy.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-proxy --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-proxy --kubeconfig {{ cluster_config_path }}/kube-proxy.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: use-context
-  command: "kubectl config use-context default --kubeconfig ~/.kube-tmp/kube-proxy.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/kube-proxy.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig
   copy:
-    src: ~/.kube-tmp/kube-proxy.kubeconfig
+    src: "{{ cluster_config_path }}/kube-proxy.kubeconfig"
     dest: /etc/kubernetes/config/kube-proxy.kubeconfig
 
 - name: Copy kube-proxy config

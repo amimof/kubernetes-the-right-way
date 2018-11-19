@@ -19,6 +19,7 @@ ExecStart=/usr/local/bin/kubelet \
   --fail-swap-on=false \
   --container-runtime=remote \
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
+  --authentication-token-webhook \
   --v=2
 Restart=on-failure
 RestartSec=5
