@@ -1,6 +1,6 @@
 ---
 - name: Determine IP address of one master
-  shell: "dig {{ groups['master'][0] }} +short"
+  shell: "dig {{ groups['masters'][0] }} +short"
   register: result
   delegate_to: 127.0.0.1
 
@@ -168,10 +168,10 @@
     force: "{{ regenerate_keys }}"
   with_items: "{{ groups['nodes'] }}"
 
-- name: Get IP address of node
+- name: Determine IP address of nodes
   shell: "dig {{ item }} +short"
   with_items: "{{ groups['nodes'] }}"
-  register: result
+  register: nodes_ip_result
 
 # kubelet certificates
 - stat: 
@@ -179,7 +179,7 @@
   register: result
   with_items: "{{ groups['nodes'] }}"
 - name: Generate node certs
-  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ result.results[item.0].stdout }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
+  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ nodes_ip_result.results[item.0].stdout }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
   with_indexed_items: "{{ groups['nodes'] }}"
   when: not result.results[item.0].stat.exists or regenerate_certificates
   args:
