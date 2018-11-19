@@ -23,6 +23,21 @@ On each host in the cluster
 * Python 2.7
 * ca-certificates
 
+# Generated certificates and configuration
+Private certificates, public certificates and configuration are generated on the control host, the host that executes the playbook. They are copied to the hosts during installation but are kept on the control host in `~/.ktrw/`. This way, the cluster can be safely removed and re-installed without having to regenerate the cluster certificates. You may set which directory to store certs and config locally using the `config_path` variable.
+
+# Variables
+There are a few variabels that you may set to furher customize the deployment. 
+
+| Name 	| Required 	| Default 	| Description 	|
+|-------------------------	|----------	|--------------------------------------	|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| `config_path` 	| `False` 	| `~/.ktrw` 	| A path to a directory on the control host were cluster certificates and configuration is created. 	|
+| `cluster_ip` 	| `False` 	| `dig {{ groups['master'][0] }} +short` 	| The public IP address of the cluster. Defaults to the default IPv4 address of the first master in the inventory. For multi-master installations, the value of cluster_ip is usually a load balancer. 	|
+| `cluster_hostname` 	| `False` 	| `groups['masters'][0]` 	| The public hostname of the cluster. Defaults to the hostname of the first master in the inventory. For multi-master installations, the value of cluster_hostname is usually a load balancer. 	|
+| `cluster_port` 	| `False` 	| `6443` 	| The port number on which kube-apiserver listens on. 	|
+| `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
+| `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
+
 # Example
 Configure an Ansible inventory file with the host groups `etcd`, `masters` and `nodes` and assign any host to their groups. Following inventory will install all components on a single host:
 ```
