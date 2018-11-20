@@ -165,10 +165,10 @@
       - kube-controller-manager
       - kube-scheduler
 
-- hosts: 127.0.0.1
-  connection: local
-  tasks:
-  - name: Remove tmp cert dir
-    file:
-      path: ~/.kube-tmp/
-      state: absent
+# - hosts: 127.0.0.1
+#   connection: local
+#   tasks:
+#   - name: Remove tmp cert dir
+#     file:
+#       path: ~/.kube-tmp/
+#       state: absent

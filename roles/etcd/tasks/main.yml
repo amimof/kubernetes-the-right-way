@@ -47,7 +47,7 @@
 
 - name: Copy certificates
   copy:
-    src: ~/.kube-tmp/pki/etcd/
+    src: "{{ cluster_config_path }}/pki/etcd/"
     dest: /etc/etcd/pki
 
 - name: Create systemd unit file

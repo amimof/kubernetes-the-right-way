@@ -23,12 +23,12 @@
     src: "{{ item }}"
     dest: /etc/kubernetes/pki
   with_items:
-    - "~/.kube-tmp/pki/master/ca.pem"
-    - "~/.kube-tmp/pki/master/service-account-key.pem"
-    - "~/.kube-tmp/pki/master/apiserver.pem"
-    - "~/.kube-tmp/pki/master/apiserver-key.pem"
-    - "~/.kube-tmp/pki/master/kubelet-peer.pem"
-    - "~/.kube-tmp/pki/master/kubelet-peer-key.pem"
+    - "{{ cluster_config_path }}/pki/master/ca.pem"
+    - "{{ cluster_config_path }}/pki/master/service-account-key.pem"
+    - "{{ cluster_config_path }}/pki/master/apiserver.pem"
+    - "{{ cluster_config_path }}/pki/master/apiserver-key.pem"
+    - "{{ cluster_config_path }}/pki/master/kubelet-peer.pem"
+    - "{{ cluster_config_path }}/pki/master/kubelet-peer-key.pem"
 
 - name: Ensure directories exist
   file:
@@ -43,9 +43,9 @@
     src: "{{ item }}"
     dest: /etc/etcd/pki
   with_items:
-    - "~/.kube-tmp/pki/etcd/ca.pem"
-    - "~/.kube-tmp/pki/etcd/etcd.pem"
-    - "~/.kube-tmp/pki/etcd/etcd-key.pem"
+    - "{{ cluster_config_path }}/pki/etcd/ca.pem"
+    - "{{ cluster_config_path }}/pki/etcd/etcd.pem"
+    - "{{ cluster_config_path }}/pki/etcd/etcd-key.pem"
 
 - name: Copy encryption-config
   copy:
