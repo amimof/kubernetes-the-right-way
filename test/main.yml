@@ -1,0 +1,38 @@
+- name: Bring up docker containers
+  hosts: all
+  vars:
+    inventory:
+      - name: kube-master
+      - name: kube-node1
+  roles:
+    - role: provision_docker
+      provision_docker_inventory: "{{inventory}}"
+ tasks:
+    - name: Group etcd
+      add_host:
+        hostname: "{{item}}"
+        groups: etcd
+      with_items:
+        - kube-master
+      tags: provision_docker
+
+    - name: Group masters
+      add_host:
+        hostname: "{{item}}"
+        groups: masters
+      with_items:
+        - kube-master
+      tags: provision_docker
+
+    - name: Group nodes
+      add_host:
+        hostname: "{{item}}"
+        groups: nodes
+      with_items:
+        - kube-node
+      tags: provision_docker
+
+    - name: "Build hosts file"
+      shell: 'echo "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }} {{inventory_hostname}}" >> /etc/hosts'
+      when: hostvars[inventory_hostname].ansible_default_ipv4.address is defined
+    - debug: msg="Running on host {{inventory_hostname}}, {{hostvars[inventory_hostname]['ansible_ssh_host']}}"
