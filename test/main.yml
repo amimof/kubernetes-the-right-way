@@ -1,3 +1,4 @@
+---
 - name: Bring up docker containers
   hosts: all
   vars:
@@ -5,9 +6,8 @@
       - name: kube-master
       - name: kube-node1
   roles:
-    - role: provision_docker
-      provision_docker_inventory: "{{inventory}}"
- tasks:
+    - { role: provision_docker, provision_docker_company: 'ansible', provision_docker_inventory: "{{ inventory }}" }
+  tasks:
     - name: Group etcd
       add_host:
         hostname: "{{item}}"
