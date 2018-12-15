@@ -1,5 +1,17 @@
+---
 - set_fact:
     cluster_port: "{{ cluster_port | default('6443') }}"
+    cluster_hostname: "{{ cluster_hostname | default(groups['nodes'][0]) }}"
+
+- set_fact:
+    config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
+  delegate_to: 127.0.0.1
+
+- set_fact:
+    cluster_name: "{{ cluster_hostname.split('.')[0] | default('kubernetes') }}"
+
+- set_fact:
+    cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
 
 - name: Download kube-apiserver
   get_url:
