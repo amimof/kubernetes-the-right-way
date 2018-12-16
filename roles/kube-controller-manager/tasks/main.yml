@@ -1,6 +1,6 @@
 ---
 - set_fact:
-    cluster_hostname: "{{ cluster_hostname | default(groups['nodes'][0]) }}"
+    cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
 
 - set_fact:
     config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
