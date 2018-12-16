@@ -11,6 +11,7 @@
       name: kube-master
       image: 'python:stretch'
       command: ["sleep", "infinity"]
+      privileged: yes
       networks:
         - name: docker_test_net
 
@@ -19,6 +20,7 @@
       name: "{{ item }}"
       image: 'python:stretch'
       command: ["sleep", "infinity"]
+      privileged: yes
       networks:
         - name: docker_test_net     
     with_items:
@@ -59,11 +61,26 @@
         - kube-node1
         - kube-node2
 
+# systemd is required so install it
+- hosts: etcd,masters,nodes
+  tasks:
+    - apt:
+        name: systemd
+        update_cache: yes
+      vars:
+        packages:
+          - systemd
+          - systemd-sysv
+    - file:
+        path: /run/dbus
+        state: directory
+    - command: dbus-daemon --system
+      ignore_errors: True
 
 - hosts: localhost
   connection: local
   roles:
-    #- tools
+    - tools
     - certificates
 
 - hosts: etcd
