@@ -63,7 +63,7 @@
 - hosts: localhost
   connection: local
   roles:
-    - tools
+    #- tools
     - certificates
 
 - hosts: etcd
