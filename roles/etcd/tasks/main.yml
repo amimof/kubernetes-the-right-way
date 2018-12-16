@@ -1,3 +1,17 @@
+---
+- set_fact:
+    cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    
+- set_fact:
+    config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
+  delegate_to: 127.0.0.1
+
+- set_fact:
+    cluster_name: "{{ cluster_hostname.split('.')[0] | default('kubernetes') }}"
+
+- set_fact:
+    cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
+
 - name: Download etcd
   get_url:
     url: https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz
