@@ -1,38 +1,85 @@
 ---
-- name: Bring up docker containers
-  hosts: all
-  vars:
-    inventory:
-      - name: kube-master
-      - name: kube-node1
-  roles:
-    - { role: provision_docker, provision_docker_company: 'ansible', provision_docker_inventory: "{{ inventory }}" }
+- hosts: localhost
+  connection: local
+  tasks:
+  - name: Create network
+    docker_network:
+      name: docker_test_net
+
+  - name: Bring up master container
+    docker_container:
+      name: kube-master
+      image: 'python:stretch'
+      command: ["sleep", "infinity"]
+      networks:
+        - name: docker_test_net
+
+  - name: Bring up node containers
+    docker_container:
+      name: "{{ item }}"
+      image: 'python:stretch'
+      command: ["sleep", "infinity"]
+      networks:
+        - name: docker_test_net     
+    with_items:
+      - kube-master
+      - kube-node1
+      - kube-node2
+        
+- hosts: localhost
   tasks:
     - name: Group etcd
       add_host:
-        hostname: "{{item}}"
+        name: kube-master
         groups: etcd
-      with_items:
-        - kube-master
-      tags: provision_docker
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
 
     - name: Group masters
       add_host:
-        hostname: "{{item}}"
+        name: kube-master
         groups: masters
-      with_items:
-        - kube-master
-      tags: provision_docker
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
 
     - name: Group nodes
       add_host:
-        hostname: "{{item}}"
+        name: "{{ item }}"
         groups: nodes
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
       with_items:
-        - kube-node
-      tags: provision_docker
+        - kube-master
+        - kube-node1
+        - kube-node2
 
-    - name: "Build hosts file"
-      shell: 'echo "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }} {{inventory_hostname}}" >> /etc/hosts'
-      when: hostvars[inventory_hostname].ansible_default_ipv4.address is defined
-    - debug: msg="Running on host {{inventory_hostname}}, {{hostvars[inventory_hostname]['ansible_ssh_host']}}"
+
+- hosts: localhost
+  connection: local
+  roles:
+    - tools
+    - certificates
+
+- hosts: etcd
+  roles:
+    - etcd
+
+- hosts: masters
+  roles:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- hosts: nodes
+  roles:
+    - cni
+    - containerd
+    - runc
+    - kube-proxy
+    - kubelet
