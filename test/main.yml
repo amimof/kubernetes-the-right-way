@@ -67,13 +67,8 @@
 - hosts: etcd,masters,nodes
   tasks:
     - yum:
-        name: "{{ item }}"
+        name: ['iproute', 'libseccomp', 'libseccomp.so.2']
         state: present
-      with_items:
-        - iproute
-        - libseccomp
-        - libseccomp.so.2
-
 
 # Now run the roles on our containers
 - name: Include a play after another play
