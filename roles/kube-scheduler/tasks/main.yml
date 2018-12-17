@@ -1,3 +1,17 @@
+---
+- set_fact:
+    cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+
+- set_fact:
+    config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
+  delegate_to: 127.0.0.1
+
+- set_fact:
+    cluster_name: "{{ cluster_hostname.split('.')[0] | default('kubernetes') }}"
+
+- set_fact:
+    cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
+    
 - name: Download kube-scheduler
   get_url:
     url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kube-scheduler
@@ -43,6 +57,12 @@
 
 - name: use-context 
   command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/kube-scheduler.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: Change file permission for kubeconfig
+  file:
+    path: "{{ cluster_config_path }}/kube-scheduler.kubeconfig"
+    mode: 0644
   delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig

@@ -1,0 +1,75 @@
+---
+# Create a network and all containers
+- hosts: localhost
+  connection: local
+  tasks:
+  - name: Create network
+    docker_network:
+      name: docker_test_net
+
+  - name: Bring up masters
+    docker_container:
+      name: kube-master
+      image: 'centos/systemd:latest'
+      privileged: yes
+      networks:
+        - name: docker_test_net
+      volumes:
+        - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+
+  - name: Bring up nodes
+    docker_container:
+      name: "{{ item }}"
+      image: 'centos/systemd:latest'
+      privileged: yes
+      networks:
+        - name: docker_test_net
+      volumes:
+        - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    with_items:
+      - kube-master
+      - kube-node1
+        
+# Compose the inventory 
+- hosts: localhost
+  tasks:
+    - name: Group etcd
+      add_host:
+        name: kube-master
+        groups: etcd
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
+
+    - name: Group masters
+      add_host:
+        name: kube-master
+        groups: masters
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
+
+    - name: Group nodes
+      add_host:
+        name: "{{ item }}"
+        groups: nodes
+        ansible_connection: docker
+        ansible_ssh_user: root
+        ansible_become_user: root
+        ansible_become: yes
+      with_items:
+        - kube-master
+        - kube-node1
+
+# Install required packages
+- hosts: etcd,masters,nodes
+  tasks:
+    - yum:
+        name: ['iproute', 'libseccomp', 'libseccomp.so.2']
+        state: present
+
+# Now run the roles on our containers
+- name: Include a play after another play
+  import_playbook: ../install.yml

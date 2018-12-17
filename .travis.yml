@@ -1,0 +1,22 @@
+sudo: required
+dist: stretch
+language: python
+python:
+  - "2.7"
+services:
+  - docker
+env:
+  global:
+    - PATH="/usr/bin:$PATH"
+
+before_install:
+  - deactivate
+  - sudo apt-get update -qq
+
+install:
+  - sudo pip install docker-py ansible
+  - ansible --version
+
+script:
+  - ansible-playbook test/main.yml --syntax-check
+  - ansible-playbook -b test/main.yml

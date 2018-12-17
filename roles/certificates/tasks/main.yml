@@ -1,14 +1,14 @@
 ---
-- name: Determine IP address of one master
-  shell: "dig {{ groups['masters'][0] }} +short"
-  register: result
-  delegate_to: 127.0.0.1
+- setup:
+    filter: ansible_default_ipv4
+  delegate_to: "{{ item }}"
+  delegate_facts: True
+  with_items: "{{ groups['etcd'] + groups['masters'] + groups['nodes'] }}"
 
 - set_fact:
-    cluster_ip: "{{ cluster_ip | default(result.stdout) }}"
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
     cluster_port: "{{ cluster_port | default('6443') }}"
-    config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
+    config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
     regenerate_certificates: "{{ regenerate_certificates | default(False) }}"
     regenerate_keys: "{{ regenerate_keys | default(False) }}"
 
@@ -17,12 +17,6 @@
 
 - set_fact:
     cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
-
-- set_fact:
-    cluster_config_path: "{{ cluster_config_path }}"
-  delegate_to: "{{ item }}"
-  delegate_facts: True
-  with_items: "{{ groups['all'] }}"
 
 - name: Ensure tmp directories exist
   file:
@@ -34,7 +28,7 @@
     - pki/master
     - pki/etcd
     - pki/node
-
+    
 - name: Create openssl config
   template:
     src: openssl.conf.j2
@@ -62,14 +56,14 @@
 - name: Change file permissions for private keys 
   file:
     path: "{{ item }}"
-    mode: 0600
+    mode: 0644
   with_fileglob:
     - "{{ cluster_config_path }}/pki/master/*-key.pem"
 
 - name: Change file permissions for etcd private keys 
   file:
     path: "{{ item }}"
-    mode: 0600
+    mode: 0644
   with_fileglob:
     - "{{ cluster_config_path }}/pki/etcd/*-key.pem"
 
@@ -168,10 +162,12 @@
     force: "{{ regenerate_keys }}"
   with_items: "{{ groups['nodes'] }}"
 
-- name: Determine IP address of nodes
-  shell: "dig {{ item }} +short"
-  with_items: "{{ groups['nodes'] }}"
-  register: nodes_ip_result
+- name: Change file permissions for private keys 
+  file:
+    path: "{{ item }}"
+    mode: 0644
+  with_fileglob:
+    - "{{ cluster_config_path }}/pki/node/*-key.pem"
 
 # kubelet certificates
 - stat: 
@@ -179,7 +175,7 @@
   register: result
   with_items: "{{ groups['nodes'] }}"
 - name: Generate node certs
-  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ nodes_ip_result.results[item.0].stdout }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
+  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ hostvars[item.1].ansible_default_ipv4.address }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
   with_indexed_items: "{{ groups['nodes'] }}"
   when: not result.results[item.0].stat.exists or regenerate_certificates
   args:

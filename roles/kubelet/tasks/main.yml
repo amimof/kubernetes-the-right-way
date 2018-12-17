@@ -1,13 +1,17 @@
-- name: Determine IP address of one master
-  shell: "dig {{ groups['nodes'][0] }} +short"
-  register: result
-  failed_when: (result.rc != 0 or result.stdout == "") and cluster_ip is undefined
+---
+- set_fact:
+    cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    cluster_port: "{{ cluster_port | default('6443') }}"
+
+- set_fact:
+    config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
   delegate_to: 127.0.0.1
 
 - set_fact:
-    cluster_ip: "{{ cluster_ip | default(result.stdout) }}"
-    cluster_hostname: "{{ cluster_hostname | default(groups['nodes'][0]) }}"
-    cluster_port: "{{ cluster_port | default('6443') }}"
+    cluster_name: "{{ cluster_hostname.split('.')[0] | default('kubernetes') }}"
+
+- set_fact:
+    cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
 
 - name: Download kubelet
   get_url:
@@ -39,15 +43,21 @@
   delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ ansible_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ ansible_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ inventory_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: use-context
   command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  delegate_to: 127.0.0.1
+
+- name: Change file permission for kubeconfig
+  file:
+    path: "{{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+    mode: 0644
   delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig
