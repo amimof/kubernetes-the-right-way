@@ -60,6 +60,7 @@
   file:
     path: "{{ cluster_config_path }}/kube-controller-manager.kubeconfig"
     mode: 0644
+  delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig
   copy:
