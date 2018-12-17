@@ -19,4 +19,4 @@ install:
 
 script:
   - ansible-playbook test/main.yml --syntax-check
-  - ansible-playbook test/main.yml
+  - ansible-playbook -b test/main.yml
