@@ -1,3 +1,4 @@
+---
 - set_fact:
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
     cluster_port: "{{ cluster_port | default('6443') }}"
@@ -42,11 +43,11 @@
   delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ ansible_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ ansible_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ inventory_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: use-context

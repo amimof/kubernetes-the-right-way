@@ -1,4 +1,5 @@
 ---
+# Create a network and all containers
 - hosts: localhost
   connection: local
   tasks:
@@ -6,28 +7,30 @@
     docker_network:
       name: docker_test_net
 
-  - name: Bring up master container
+  - name: Bring up masters
     docker_container:
       name: kube-master
-      image: 'python:stretch'
-      command: ["sleep", "infinity"]
+      image: 'centos/systemd:latest'
       privileged: yes
       networks:
         - name: docker_test_net
+      volumes:
+        - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
-  - name: Bring up node containers
+  - name: Bring up nodes
     docker_container:
       name: "{{ item }}"
-      image: 'python:stretch'
-      command: ["sleep", "infinity"]
+      image: 'centos/systemd:latest'
       privileged: yes
       networks:
-        - name: docker_test_net     
+        - name: docker_test_net
+      volumes:
+        - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     with_items:
       - kube-master
       - kube-node1
-      - kube-node2
         
+# Compose the inventory 
 - hosts: localhost
   tasks:
     - name: Group etcd
@@ -59,44 +62,19 @@
       with_items:
         - kube-master
         - kube-node1
-        - kube-node2
 
-# systemd is required so install it
+# Install required packages
 - hosts: etcd,masters,nodes
   tasks:
-    - apt:
-        name: systemd
-        update_cache: yes
-      vars:
-        packages:
-          - systemd
-          - systemd-sysv
-    - file:
-        path: /run/dbus
-        state: directory
-    - command: dbus-daemon --system
-      ignore_errors: True
+    - yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - iproute
+        - libseccomp
+        - libseccomp.so.2
 
-- hosts: localhost
-  connection: local
-  roles:
-    - tools
-    - certificates
 
-- hosts: etcd
-  roles:
-    - etcd
-
-- hosts: masters
-  roles:
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-scheduler
-
-- hosts: nodes
-  roles:
-    - cni
-    - containerd
-    - runc
-    - kube-proxy
-    - kubelet
+# Now run the roles on our containers
+- name: Include a play after another play
+  import_playbook: ../install.yml

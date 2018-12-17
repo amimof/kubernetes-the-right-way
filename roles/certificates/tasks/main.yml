@@ -18,12 +18,6 @@
 - set_fact:
     cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
 
-- set_fact:
-    cluster_config_path: "{{ cluster_config_path }}"
-  delegate_to: "{{ item }}"
-  delegate_facts: True
-  with_items: "{{ groups['all'] }}"
-
 - name: Ensure tmp directories exist
   file:
     state: directory

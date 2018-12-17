@@ -1,8 +1,13 @@
+[![Build Status](https://travis-ci.org/amimof/kubernetes-the-right-way.svg?branch=master)](https://travis-ci.org/amimof/kubernetes-the-right-way)
+
 # Kubernetes The Right Way
 Install a Kubernetes cluster with Ansible on any infrastructure. Have a production ready cluster in no time!
 
-<img src="https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png" width="100"> 
-<img src="https://github.com/bobthebutcher/vendor-icons-svg/raw/master/ansible.svg?sanitize=true" width="100">
+<p float="left">
+  <img src="https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png" width="100"> 
+  <img src="https://github.com/bobthebutcher/vendor-icons-svg/raw/master/ansible.svg?sanitize=true" width="100">
+</p>
+
 
 After a successfull install you will have a cluster with:
 * [containerd](https://github.com/containerd/containerd) as container runtime
@@ -34,7 +39,6 @@ There are a few variabels that you may set to furher customize the deployment.
 | Name 	| Required 	| Default 	| Description 	|
 |-------------------------	|----------	|--------------------------------------	|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
 | `config_path` 	| `False` 	| `~/.ktrw` 	| A path to a directory on the control host were cluster certificates and configuration is created. 	|
-| `cluster_ip` 	| `False` 	| `dig {{ groups['master'][0] }} +short` 	| The public IP address of the cluster. Defaults to the default IPv4 address of the first master in the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html). For multi-master installations, the value of cluster_ip is usually a load balancer. 	|
 | `cluster_hostname` 	| `False` 	| `groups['masters'][0]` 	| The public hostname of the cluster. Defaults to the hostname of the first master in the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html). For multi-master installations, the value of cluster_hostname is usually a load balancer. 	|
 | `cluster_port` 	| `False` 	| `6443` 	| The port number on which kube-apiserver listens on. 	|
 | `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
@@ -71,7 +75,6 @@ master.mydomain.com
 ```
 [all:vars]
 cluster_hostname=masters.mydomain.com
-cluster_ip=172.41.1.10
 
 [etcd]
 master-1.mydomain.com
@@ -92,7 +95,6 @@ node-2.mydomain.com
 ```
 [all:vars]
 cluster_hostname=masters.mydomain.com
-cluster_ip=172.41.1.10
 
 [etcd]
 etcd-1.mydomain.com
