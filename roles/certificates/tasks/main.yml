@@ -29,6 +29,14 @@
     - pki/etcd
     - pki/node
 
+- name: file: 
+    dest: /foo/bar/somedir
+    owner: root 
+    group: apache 
+    mode: u=rwX,g=rX,o=rX
+    recurse: yes
+
+
 - name: Create openssl config
   template:
     src: openssl.conf.j2
@@ -56,14 +64,14 @@
 - name: Change file permissions for private keys 
   file:
     path: "{{ item }}"
-    mode: 0600
+    mode: 0644
   with_fileglob:
     - "{{ cluster_config_path }}/pki/master/*-key.pem"
 
 - name: Change file permissions for etcd private keys 
   file:
     path: "{{ item }}"
-    mode: 0600
+    mode: 0644
   with_fileglob:
     - "{{ cluster_config_path }}/pki/etcd/*-key.pem"
 
