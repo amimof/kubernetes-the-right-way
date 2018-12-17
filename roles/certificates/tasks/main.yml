@@ -8,7 +8,7 @@
 - set_fact:
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
     cluster_port: "{{ cluster_port | default('6443') }}"
-    config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
+    config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
     regenerate_certificates: "{{ regenerate_certificates | default(False) }}"
     regenerate_keys: "{{ regenerate_keys | default(False) }}"
 

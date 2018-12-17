@@ -4,7 +4,7 @@
     cluster_port: "{{ cluster_port | default('6443') }}"
 
 - set_fact:
-    config_path: "{{ config_path | default(ansible_env.HOME+'/.ktrw') }}"
+    config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
   delegate_to: 127.0.0.1
 
 - set_fact:

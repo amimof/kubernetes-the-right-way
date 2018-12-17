@@ -18,5 +18,5 @@ install:
   - ansible --version
 
 script:
-  - sudo ansible-playbook -i test/inventory test/main.yml --syntax-check
-  - sudo ansible-playbook -i test/inventory test/main.yml
+  - ansible-playbook test/main.yml --syntax-check
+  - ansible-playbook test/main.yml
