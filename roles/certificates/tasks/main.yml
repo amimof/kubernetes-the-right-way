@@ -28,15 +28,7 @@
     - pki/master
     - pki/etcd
     - pki/node
-
-- name: file: 
-    dest: /foo/bar/somedir
-    owner: root 
-    group: apache 
-    mode: u=rwX,g=rX,o=rX
-    recurse: yes
-
-
+    
 - name: Create openssl config
   template:
     src: openssl.conf.j2
