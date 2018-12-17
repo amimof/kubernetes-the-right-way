@@ -10,7 +10,6 @@ env:
     - PATH="/usr/bin:$PATH"
 
 before_install:
-    # Ansible doesn't play well with virtualenv
   - deactivate
   - sudo apt-get update -qq
 
@@ -19,5 +18,5 @@ install:
   - ansible --version
 
 script:
-  - ansible-playbook -i test/inventory test/main.yml --syntax-check
-  - ansible-playbook -i test/inventory test/main.yml
+  - sudo ansible-playbook -i test/inventory test/main.yml --syntax-check
+  - sudo ansible-playbook -i test/inventory test/main.yml
