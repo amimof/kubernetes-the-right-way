@@ -54,6 +54,11 @@
   command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
 
+- name: Change file permission for kubeconfig
+  file:
+    path: "{{ cluster_config_path }}/kube-controller-manager.kubeconfig"
+    mode: 0644
+
 - name: Copy kubeconfig
   copy:
     src: "{{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
