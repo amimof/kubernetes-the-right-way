@@ -4,20 +4,20 @@
     - tools
     - certificates
 
-- hosts: etcd
-  roles:
-    - etcd
-
-- hosts: masters
-  roles:
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-scheduler
+#- hosts: etcd
+#  roles:
+#    - etcd
+#
+#- hosts: masters
+#  roles:
+#    - kube-apiserver
+#    - kube-controller-manager
+#    - kube-scheduler
 
 - hosts: nodes
   roles:
-    - cni
-    - containerd
-    - runc
-    - kube-proxy
+#    - cni
+#    - containerd
+#    - runc
+#    - kube-proxy
     - kubelet

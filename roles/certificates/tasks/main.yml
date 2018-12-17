@@ -162,6 +162,13 @@
     force: "{{ regenerate_keys }}"
   with_items: "{{ groups['nodes'] }}"
 
+- name: Change file permissions for private keys 
+  file:
+    path: "{{ item }}"
+    mode: 0644
+  with_fileglob:
+    - "{{ cluster_config_path }}/pki/node/*-key.pem"
+
 # kubelet certificates
 - stat: 
     path: "{{ cluster_config_path }}/pki/node/system:node:{{ item }}.pem"
