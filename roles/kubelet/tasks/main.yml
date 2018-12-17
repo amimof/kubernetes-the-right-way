@@ -31,29 +31,29 @@
     src: "{{ item }}"
     dest: /etc/kubernetes/pki
   with_fileglob:
-    - "{{ cluster_config_path }}/pki/node/system:node:{{ ansible_fqdn }}*"
+    - "{{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}*"
     - "{{ cluster_config_path }}/pki/master/ca.pem"
 
 - name: Create kubelet kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig {{ cluster_config_path }}/system:node:{{ ansible_fqdn }}.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ ansible_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ ansible_fqdn }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ ansible_fqdn }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ ansible_fqdn }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ ansible_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ ansible_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ ansible_fqdn }}.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ ansible_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
  
 - name: use-context
-  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ ansible_fqdn }}.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
 
 - name: Copy kubeconfig
   copy:
-    src: "{{ cluster_config_path }}/system:node:{{ ansible_fqdn }}.kubeconfig"
-    dest: /etc/kubernetes/config/system:node:{{ ansible_fqdn }}.kubeconfig
+    src: "{{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+    dest: /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig
 
 - name: Create systemd unit file
   template:

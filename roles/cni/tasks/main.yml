@@ -19,7 +19,7 @@
     src: "{{ item }}"
     dest: "/etc/cni/net.d/{{ item[:-3]}}"
   with_items:
-    - 10-bridge.conf.j2
+    - 10-bridge.conflist.j2
     - 99-loopback.conf.j2
 
 

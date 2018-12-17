@@ -1,4 +1,4 @@
----
+---  
 - name: Determine IP address of one master
   shell: "dig {{ groups['nodes'][0] }} +short"
   register: result
