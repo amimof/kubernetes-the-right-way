@@ -1,6 +1,6 @@
 galaxy_info:
   author: Amir Mofasser <github.com/amimof>
-  description: Kubernetes kubectl
+  description: Installs Kubernetes with Ansible
   issue_tracker_url: https://github.com/amimof/kubernetes-the-right-way/issues
   license: MIT
   min_ansible_version: 1.2
