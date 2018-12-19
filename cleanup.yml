@@ -57,6 +57,13 @@
     file:
       path: /etc/systemd/system/kube-proxy.service
       state: absent
+  
+  - name: Unmount volumes
+    mount:
+      path: "{{ item }}"
+      state: unmounted
+    with_items:
+      - /var/lib/kubelet
 
   - name: Remove directories
     file:
