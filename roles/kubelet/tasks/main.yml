@@ -39,20 +39,28 @@
     - "{{ cluster_config_path }}/pki/master/ca.pem"
 
 - name: Create kubelet kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
+  run_once: True
+  with_items: "{{ groups['nodes'] }}"
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ hostvars[item].inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
+  run_once: True
+  with_items: "{{ groups['nodes'] }}"
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ inventory_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ hostvars[item].inventory_hostname }} --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
+  run_once: True
+  with_items: "{{ groups['nodes'] }}"
  
 - name: use-context
-  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
+  run_once: True
+  with_items: "{{ groups['nodes'] }}"
 
 - name: Change file permission for kubeconfig
   file:

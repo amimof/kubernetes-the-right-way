@@ -1,7 +1,7 @@
 - hosts: localhost
   connection: local
   roles:
-    - tools
+    - kubectl
     - certificates
 
 - hosts: etcd

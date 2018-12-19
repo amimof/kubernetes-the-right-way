@@ -70,6 +70,27 @@
         name: ['iproute', 'libseccomp', 'libseccomp.so.2']
         state: present
 
-# Now run the roles on our containers
-- name: Include a play after another play
+# Run install.yml
+- name: Run install.yml
   import_playbook: ../install.yml
+
+# Run cleanup.yml
+- name: Run cleanup.yml
+  import_playbook: ../cleanup.yml
+
+# Cleanup tests
+- hosts: localhost
+  tasks:
+  - name: Stop and remove containers
+    docker_container:
+      name: "{{ item }}"
+      image: 'centos/systemd:latest'
+      state: stopped
+    with_items:
+      - kube-master
+      - kube-node1
+
+  - name: Remove network
+    docker_network:
+      name: docker_test_net
+      state: absent
