@@ -114,6 +114,21 @@ node-2.mydomain.com
 ## Adding nodes
 To add a node to an existing cluster is as easy as adding it to the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) and running `install.yml` again.
 
+# Version matrix
+
+| Name                      | Version   | Role       |
+| ------------------------- | --------- | ---------- |
+| cni                       | 0.6.0     | node       |
+| containerd                | 1.1.3     | node       |
+| etcd                      | 3.3.9     | etcd       |
+| kube-apiserver            | 1.11.2    | master     |
+| kube-controller-manager   | 1.11.2    | master     |
+| kube-scheduler            | 1.11.2    | master     |
+| kube-proxy                | 1.11.2    | node       |
+| kubelet                   | 1.11.2    | node       |
+| kubectl                   | 1.11.2    | controller |
+| runc                      | 1.0.0-rc5 | node       |
+
 # How to contribute
 This project is MIT licensed and accepts contributions via GitHub pull requests.
 
