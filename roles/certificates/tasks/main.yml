@@ -13,7 +13,7 @@
     regenerate_keys: "{{ regenerate_keys | default(False) }}"
 
 - set_fact:
-    cluster_name: "{{ cluster_hostname.split('.')[0] | default('kubernetes') }}"
+    cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
 
 - set_fact:
     cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
