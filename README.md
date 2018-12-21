@@ -41,6 +41,7 @@ There are a few variabels that you may set to furher customize the deployment.
 | `config_path` 	| `False` 	| `~/.ktrw` 	| A path to a directory on the control host were cluster certificates and configuration is created. 	|
 | `cluster_hostname` 	| `False` 	| `groups['masters'][0]` 	| The public hostname of the cluster. Defaults to the hostname of the first master in the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html). For multi-master installations, the value of cluster_hostname is usually a load balancer. 	|
 | `cluster_port` 	| `False` 	| `6443` 	| The port number on which kube-apiserver listens on. 	|
+| `cluster_name` 	| `False` 	| `cluster_hostname.split('.')[0]` 	| The name of the cluster, used for identification in `kubectl`. Defaults to the first segment of the `cluster_hostname`. 	|
 | `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
 
