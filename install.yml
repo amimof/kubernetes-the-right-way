@@ -3,6 +3,7 @@
   roles:
     - kubectl
     - certificates
+  become: no
 
 - hosts: etcd
   roles:
