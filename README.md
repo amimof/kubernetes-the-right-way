@@ -54,7 +54,7 @@ ansible-playbook -i inventory install.yml
 # Cleanup
 To remove a cluster run the `cleanup.yml` playbook.
 ```
-ansible-playbook -i inventory clanup.yml
+ansible-playbook -i inventory cleanup.yml
 ```
 
 # Examples
