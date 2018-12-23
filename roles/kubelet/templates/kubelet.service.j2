@@ -1,28 +1,21 @@
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
- 
+After=containerd.service
+Requires=containerd.service
+
 [Service]
 ExecStart=/usr/local/bin/kubelet \
-  --allow-privileged=true \
-  --anonymous-auth=false \
-  --authorization-mode=Webhook \
-  --client-ca-file=/etc/kubernetes/pki/ca.pem \
-  --cluster-dns=10.32.0.10 \
-  --cluster-domain=cluster.local \
-  --image-pull-progress-deadline=2m \
-  --kubeconfig=/etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig \
-  --register-node=true \
-  --runtime-request-timeout=15m \
-  --tls-cert-file=/etc/kubernetes/pki/system:node:{{ inventory_hostname }}.pem \
-  --tls-private-key-file=/etc/kubernetes/pki/system:node:{{ inventory_hostname }}-key.pem \
-  --fail-swap-on=false \
+  --config=/var/lib/kubelet/kubelet-config.yaml \
   --container-runtime=remote \
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
-  --authentication-token-webhook \
+  --image-pull-progress-deadline=2m \
+  --kubeconfig=/etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig \
+  --network-plugin=cni \
+  --register-node=true \
   --v=2
 Restart=on-failure
 RestartSec=5
- 
+
 [Install]
 WantedBy=multi-user.target

@@ -73,6 +73,11 @@
     src: "{{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
     dest: /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig
 
+- name: Create kubelet config
+  template:
+    src: kubelet.yml.j2
+    dest: "/etc/kubernetes/config/system:node:{{ inventory_hostname }}.yml"
+
 - name: Create systemd unit file
   template:
     src: kubelet.service.j2
