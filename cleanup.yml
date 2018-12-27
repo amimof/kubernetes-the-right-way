@@ -57,13 +57,17 @@
     file:
       path: /etc/systemd/system/kube-proxy.service
       state: absent
-  
+
+  - name: Find mounted directories
+    shell: "awk '$2 ~ path {print $2}' path=/var/lib/kubelet /proc/mounts"
+    register: "result"
+
   - name: Unmount volumes
     mount:
       path: "{{ item }}"
       state: unmounted
     with_items:
-      - /var/lib/kubelet
+      - "{{ result.stdout_lines }}"
 
   - name: Remove directories
     file:
