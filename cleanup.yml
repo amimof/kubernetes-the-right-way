@@ -183,3 +183,21 @@
       - kube-apiserver
       - kube-controller-manager
       - kube-scheduler
+
+- hosts: localhost
+  connection: local
+  tasks:
+    - set_fact:
+        cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+
+    - set_fact:
+        cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
+
+    - name: Delete context
+      shell: "kubectl config delete-context {{ cluster_name }} --kubeconfig ~/.kube/config"
+
+    - name: Delete cluster
+      shell: "kubectl config delete-cluster {{ cluster_name }} --kubeconfig ~/.kube/config"
+
+    - name: Delete credentials
+      shell: "kubectl config unset users.{{ cluster_name }} --kubeconfig ~/.kube/config"
