@@ -12,6 +12,7 @@
       name: kube-master
       image: 'centos/systemd:latest'
       privileged: yes
+      hostname: kube-master
       networks:
         - name: docker_test_net
       volumes:
@@ -22,6 +23,7 @@
       name: "{{ item }}"
       image: 'centos/systemd:latest'
       privileged: yes
+      hostname: "{{ item }}"
       networks:
         - name: docker_test_net
       volumes:
@@ -67,12 +69,60 @@
 - hosts: etcd,masters,nodes
   tasks:
     - yum:
-        name: ['iproute', 'libseccomp', 'libseccomp.so.2']
+        name: ['iproute', 'libseccomp', 'libseccomp-devel']
         state: present
+
+    - name: Remove swapfile from /etc/fstab
+      mount:
+        name: swap
+        fstype: swap
+        state: absent
+
+    - name: Disable swap
+      command: swapoff -a
+      when: ansible_swaptotal_mb > 0
 
 # Run install.yml
 - name: Run install.yml
   import_playbook: ../install.yml
+
+# Run Smoke tests
+- name: Smoke tests
+  hosts: localhost
+  tasks:
+    - name: Get IP address of kube-master container
+      shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
+      register: result
+
+    - debug:
+        var: result.stdout
+
+    - name: Add kube-master to /etc/hosts
+      become: True
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^kube-master'
+        line: "{{ result.stdout }} kube-master"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Verify kube-apiserver 
+      uri:
+        url: "https://kube-master:6443/api/v1"
+        user: kube
+        validate_certs: no
+        status_code: 200
+
+    - name: Verify nodes are ready
+      shell: "kubectl get nodes"
+      register: result
+      until: '"NotReady" not in result.stdout'
+      retries: 60
+      delay: 2
+
+    - name: Create namespace
+      shell: "kubectl create ns ktrw-tests"
 
 # Run cleanup.yml
 - name: Run cleanup.yml
