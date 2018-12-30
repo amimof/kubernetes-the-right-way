@@ -2,7 +2,7 @@
 # Kubectl for Linux
 - name: Get kubectl
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubectl
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: 0755
   when: ansible_distribution != 'MacOSX'
@@ -10,7 +10,7 @@
 # Kubectl for MacOS
 - name: Get kubectl
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/darwin/amd64/kubectl
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/darwin/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: 0755
   when: ansible_distribution == 'MacOSX'

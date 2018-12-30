@@ -15,7 +15,7 @@
 
 - name: Download kubelet
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubelet
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubelet
     dest: /usr/local/bin/kubelet
     mode: 0755
     owner: root
@@ -72,6 +72,11 @@
   copy:
     src: "{{ cluster_config_path }}/system:node:{{ inventory_hostname }}.kubeconfig"
     dest: /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig
+
+- name: Create kubelet config
+  template:
+    src: kubelet.yml.j2
+    dest: "/etc/kubernetes/config/system:node:{{ inventory_hostname }}.yml"
 
 - name: Create systemd unit file
   template:

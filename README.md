@@ -1,15 +1,14 @@
 [![Build Status](https://travis-ci.org/amimof/kubernetes-the-right-way.svg?branch=master)](https://travis-ci.org/amimof/kubernetes-the-right-way)
 
 # Kubernetes The Right Way
-Install a Kubernetes cluster with Ansible on any infrastructure. Have a production ready cluster in no time!
+Install a [Kubernetes](https://kubernetes.io/) cluster with [Ansible](https://www.ansible.com/) on any infrastructure. Have a vanilla, almost-production-ready cluster in no time! 
 
 <p float="left">
   <img src="https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png" width="100"> 
   <img src="https://github.com/bobthebutcher/vendor-icons-svg/raw/master/ansible.svg?sanitize=true" width="100">
 </p>
 
-
-After a successfull install you will have a cluster with:
+This project aims to provide an automated way of deploying a Kubernetes cluster that isn't configured. This means that configuration and host preparations lies in the hands of the user executing the playbooks. After a successfull install you will have a cluster with:
 * [containerd](https://github.com/containerd/containerd) as container runtime
 * [runc](https://github.com/opencontainers/runc) for managing containers
 * [cni](https://github.com/containernetworking/cni) plugins
@@ -18,6 +17,15 @@ After a successfull install you will have a cluster with:
 * one or more nodes (kubelet)
 * a certificate authority for etcd
 * a certificate authority for kube components
+
+What you will **not** have:
+* Host-level validation and pre-flight checks
+* DNS plugin
+* Pod networking
+* Ingress
+* Node roles
+
+As always, it's highly recommended that you verify that your hosting environment meets any requirements before installing Kubernetes and its components.
 
 # Requirements
 
@@ -120,15 +128,15 @@ To add a node to an existing cluster is as easy as adding it to the [inventory](
 | Name                      | Version   | Role       |
 | ------------------------- | --------- | ---------- |
 | cni                       | 0.6.0     | node       |
-| containerd                | 1.1.3     | node       |
+| containerd                | 1.2.1     | node       |
 | etcd                      | 3.3.9     | etcd       |
-| kube-apiserver            | 1.11.2    | master     |
-| kube-controller-manager   | 1.11.2    | master     |
-| kube-scheduler            | 1.11.2    | master     |
-| kube-proxy                | 1.11.2    | node       |
-| kubelet                   | 1.11.2    | node       |
-| kubectl                   | 1.11.2    | controller |
-| runc                      | 1.0.0-rc5 | node       |
+| kube-apiserver            | 1.13.1    | master     |
+| kube-controller-manager   | 1.13.1    | master     |
+| kube-scheduler            | 1.13.1    | master     |
+| kube-proxy                | 1.13.1    | node       |
+| kubelet                   | 1.13.1    | node       |
+| kubectl                   | 1.13.1    | controller |
+| runc                      | 1.0.0-rc6 | node       |
 
 # How to contribute
 This project is MIT licensed and accepts contributions via GitHub pull requests.
