@@ -166,6 +166,7 @@
       image: 'centos/systemd:latest'
       state: stopped
     with_items:
+      - etcd
       - kube-master
       - kube-node1
 
