@@ -6,8 +6,26 @@
   - name: Create network
     docker_network:
       name: docker_test_net
+      ipam_options:
+        subnet: '172.19.0.0/16'
+        gateway: 172.19.0.1
 
-  - name: Bring up masters
+  - name: Bring up etcd
+    docker_container:
+      name: etcd
+      image: 'centos/systemd:latest'
+      privileged: yes
+      hostname: etcd
+      networks:
+        - name: docker_test_net
+          ipv4_address: 172.19.0.2
+      etc_hosts:
+        kube-master: 172.19.0.3
+        kube-node1: 172.19.0.4
+      volumes:
+        - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+
+  - name: Bring up master
     docker_container:
       name: kube-master
       image: 'centos/systemd:latest'
@@ -15,29 +33,34 @@
       hostname: kube-master
       networks:
         - name: docker_test_net
+          ipv4_address: 172.19.0.3
+      etc_hosts:
+        etcd: 172.19.0.2
+        kube-node1: 172.19.0.4
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
   - name: Bring up nodes
     docker_container:
-      name: "{{ item }}"
+      name: kube-node1
       image: 'centos/systemd:latest'
       privileged: yes
-      hostname: "{{ item }}"
+      hostname: kube-node1
+      etc_hosts:
+        etcd: 172.19.0.2
+        kube-master: 172.19.0.3
       networks:
         - name: docker_test_net
+          ipv4_address: 172.19.0.4
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    with_items:
-      - kube-master
-      - kube-node1
         
 # Compose the inventory 
 - hosts: localhost
   tasks:
     - name: Group etcd
       add_host:
-        name: kube-master
+        name: etcd
         groups: etcd
         ansible_connection: docker
         ansible_ssh_user: root
@@ -68,8 +91,9 @@
 # Install required packages
 - hosts: etcd,masters,nodes
   tasks:
+
     - yum:
-        name: ['iproute', 'libseccomp', 'libseccomp-devel']
+        name: ['iproute', 'libseccomp', 'libseccomp-devel', 'conntrack']
         state: present
 
     - name: Remove swapfile from /etc/fstab
@@ -90,18 +114,16 @@
 - name: Smoke tests
   hosts: localhost
   tasks:
+
     - name: Get IP address of kube-master container
       shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
       register: result
-
-    - debug:
-        var: result.stdout
 
     - name: Add kube-master to /etc/hosts
       become: True
       lineinfile:
         path: /etc/hosts
-        regexp: '^kube-master'
+        regexp: '^.*kube-master'
         line: "{{ result.stdout }} kube-master"
         owner: root
         group: root
@@ -121,8 +143,15 @@
       retries: 60
       delay: 2
 
+    - name: Get namespace
+      shell: "kubectl get namespace ktrw-tests"
+      register: result
+      ignore_errors: True
+      no_log: True
+
     - name: Create namespace
       shell: "kubectl create ns ktrw-tests"
+      when: '"NotFound" in result.stderr'
 
 # Run cleanup.yml
 - name: Run cleanup.yml
