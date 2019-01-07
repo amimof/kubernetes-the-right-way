@@ -39,16 +39,16 @@
     - "{{ cluster_config_path }}/pki/master/ca.pem"
 
 - name: Create kubelet kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority /etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig /etc/kubernetes/config/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-cluster kubernetes --certificate-authority /etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig"
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ hostvars[item].inventory_hostname }} --client-certificate /etc/kubernetes/pki/system:node:{{ hostvars[item].inventory_hostname }}.pem --client-key /etc/kubernetes/pki/system:node:{{ hostvars[item].inventory_hostname }}-key.pem --embed-certs=true --kubeconfig /etc/kubernetes/config/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate /etc/kubernetes/pki/system:node:{{ inventory_hostname }}.pem --client-key /etc/kubernetes/pki/system:node:{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig"
  
 - name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ hostvars[item].inventory_hostname }} --kubeconfig /etc/kubernetes/config/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:node:{{ inventory_hostname }} --kubeconfig /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig"
  
 - name: use-context
-  command: "kubectl config use-context default --kubeconfig /etc/kubernetes/config/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
+  command: "kubectl config use-context default --kubeconfig /etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig"
 
 - name: Create kubelet config
   template:
