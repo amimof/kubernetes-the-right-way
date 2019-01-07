@@ -5,6 +5,7 @@
     url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: 0755
+    checksum: sha256:8668ecbf286774e5f7d9aa849f95af2940c491a258459f93c5dd3e3c836c2cb1
   when: ansible_distribution != 'MacOSX'
 
 # Kubectl for MacOS
@@ -13,4 +14,5 @@
     url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/darwin/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: 0755
+    checksum: sha256:ddebf621822a477ade23aeb3a00f214591e5031342f3a52403c0be8fa1696d2b
   when: ansible_distribution == 'MacOSX'

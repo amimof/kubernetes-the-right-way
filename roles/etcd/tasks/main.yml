@@ -19,6 +19,7 @@
     mode: 0755
     owner: root
     group: root
+    checksum: sha256:7b95bdc6dfd1d805f650ea8f886fdae6e7322f886a8e9d1b0d14603767d053b1
 
 - name: Unarchive etcd tarball
   unarchive:
