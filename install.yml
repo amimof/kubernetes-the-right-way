@@ -10,12 +10,14 @@
 
 - hosts: masters
   roles:
+    - kubectl
     - kube-apiserver
     - kube-controller-manager
     - kube-scheduler
 
 - hosts: nodes
   roles:
+    - kubectl
     - cni
     - containerd
     - runc

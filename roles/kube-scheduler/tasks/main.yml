@@ -44,35 +44,16 @@
     dest: /etc/kubernetes/config/
 
 - name: Create kube-scheduler kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig {{ cluster_config_path }}/kube-scheduler.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
+  command: "kubectl config set-cluster kubernetes --certificate-authority /etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:kube-scheduler --client-certificate {{ cluster_config_path }}/pki/master/kube-scheduler.pem --client-key {{ cluster_config_path }}/pki/master/kube-scheduler-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/kube-scheduler.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
+  command: "kubectl config set-credentials system:kube-scheduler --client-certificate /etc/kubernetes/pki/kube-scheduler.pem --client-key /etc/kubernetes/pki/kube-scheduler-key.pem --embed-certs=true --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
 
 - name: set-context 
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig {{ cluster_config_path }}/kube-scheduler.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
+  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
 
 - name: use-context 
-  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/kube-scheduler.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
-
-- name: Change file permission for kubeconfig
-  file:
-    path: "{{ cluster_config_path }}/kube-scheduler.kubeconfig"
-    mode: 0644
-  delegate_to: 127.0.0.1
-
-- name: Copy kubeconfig
-  copy:
-    src: "{{ cluster_config_path }}/kube-scheduler.kubeconfig"
-    dest: /etc/kubernetes/config/kube-scheduler.kubeconfig
+  command: "kubectl config use-context default --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
 
 - name: Create systemd unit file
   template:
