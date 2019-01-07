@@ -45,7 +45,7 @@
   with_items: "{{ groups['nodes'] }}"
 
 - name: set-credentials 
-  command: "kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ hostvars[item].inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
+  command: "kubectl config set-credentials system:node:{{ hostvars[item].inventory_hostname }} --client-certificate {{ cluster_config_path }}/pki/node/system:node:{{ hostvars[item].inventory_hostname }}.pem --client-key {{ cluster_config_path }}/pki/node/system:node:{{ hostvars[item].inventory_hostname }}-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/system:node:{{ hostvars[item].inventory_hostname }}.kubeconfig"
   delegate_to: 127.0.0.1
   run_once: True
   with_items: "{{ groups['nodes'] }}"
