@@ -88,6 +88,7 @@
       - ctr
       - containerd
       - containerd-shim
+      - containerd-shim-runc-v1
       - containerd-release
       - containerd-stress
       - runc
