@@ -20,6 +20,7 @@
     mode: 0755
     owner: root
     group: root
+    checksum: sha256:0e5adc6d7dc00d923ef23ff6027d5d4668ade914aad0fbd2420e48c9cb24421c
 
 - name: Ensure directories exist
   file:

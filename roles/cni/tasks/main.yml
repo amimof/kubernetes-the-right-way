@@ -5,14 +5,46 @@
     path: "{{ item }}"
     mode: 0755
   with_items:
+    - /tmp/cni
     - /etc/cni/net.d
     - /opt/cni/bin
 
 - name: Download cni
+  get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
+    dest: /tmp/cni-plugins-amd64-v0.6.0.tgz
+    mode: 0755
+    owner: root
+    group: root
+    checksum: sha256:f04339a21b8edf76d415e7f17b620e63b8f37a76b2f706671587ab6464411f2d
+
+- name: Unarchive tarball
   unarchive:
-    src: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
-    dest: /opt/cni/bin/
+    src: /tmp/cni-plugins-amd64-v0.6.0.tgz
+    dest: /tmp/cni
     remote_src: True
+
+- name: List binaries
+  find:
+    paths: /tmp/cni
+    file_type: file
+  register: result
+
+- name: Move binaries into place
+  copy:
+    src: "{{ item.path }}"
+    dest: "/opt/cni/bin/{{ item.path | basename }}"
+    mode: 0755
+    remote_src: True
+  with_items: "{{ result.files }}"
+
+- name: Remove tmp download files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/cni-plugins-amd64-v0.6.0.tgz
+    - /tmp/cni
 
 - name: Create networks
   template:
