@@ -76,6 +76,7 @@
     with_items:
       - /var/lib/kubelet
       - /var/lib/containerd
+      - /var/lib/cni
       - /etc/kubernetes
       - /etc/containerd
       - /etc/cni
