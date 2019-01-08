@@ -5,7 +5,6 @@
     path: "{{ item }}"
     mode: 0755
   with_items:
-    - /tmp/containerd
     - /etc/containerd
 
 - name: Download containerd
