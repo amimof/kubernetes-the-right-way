@@ -9,7 +9,6 @@
     path: "{{ item }}"
     mode: 0755
   with_items:
-    - /tmp/cni
     - /etc/cni/net.d
     - /opt/cni/bin
 
@@ -19,12 +18,9 @@
     dest: /opt/cni/bin/
     remote_src: True
 
-- name: Create networks
+- name: Create loopback net
   template:
-    src: "{{ item }}"
-    dest: "/etc/cni/net.d/{{ item[:-3]}}"
-  with_items:
-    - 10-bridge.conflist.j2
-    - 99-loopback.conf.j2
+    src: 99-loopback.conf.j2
+    dest: /etc/cni/net.d/99-loopback.conf
 
 
