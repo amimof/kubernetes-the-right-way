@@ -52,7 +52,10 @@ There are a few variables that you may set to further customize the deployment.
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
 
 # Deploying a cluster
-Configure an Ansible [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) file with the host groups `etcd`, `masters` and `nodes` and assign any host to their respective groups. Have a look at the [examples](https://github.com/amimof/kubernetes-the-right-way/tree/master/example). After you've defined an inventory, run the `install.yml` playbook.
+Configure an Ansible [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) file with the host groups `etcd`, `masters` and `nodes` and assign any host to their respective groups. Have a look at the [examples](https://github.com/amimof/kubernetes-the-right-way/tree/master/example). After you've defined an inventory, run the `install.yml` playbook. 
+
+**Note!** If you plan on using `flannel` in your cluster, you must set `cluster_cidr=10.244.0.0/16` in the inventory.
+
 ```
 ansible-playbook -i inventory install.yml
 ``` 
@@ -60,12 +63,12 @@ ansible-playbook -i inventory install.yml
 ## Installing additional plugins
 After installation, you will have a bare minimum cluster. This means no cluster network or DNS. Refer to the [kubernetes docs](https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy) for more info. The choice is up to you. If you're not sure which ones to use, just stick with `flannel` and `CoreDNS` and you'll be fine.
 
-Install `flannel` onto the cluster
+Deploy `flannel` onto the cluster
 ```
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-Install `CoreDNS` onto the cluster
+Deploy `CoreDNS` onto the cluster
 ```
 kubectl apply -f https://storage.googleapis.com/kubernetes-the-hard-way/coredns.yaml
 ```
@@ -75,6 +78,9 @@ To remove a cluster run the `cleanup.yml` playbook.
 ```
 ansible-playbook -i inventory cleanup.yml
 ```
+
+# Generated certs and config
+During installation private certificates, public certificates and configuration are generated on the control host, the host that executes the playbook. They are then copied to the hosts during installation but are kept on the control host in `~/.ktrw/`. This way, the cluster can be safely removed and re-installed without having to regenerate the cluster certificates. You may set which directory to store certs and config locally using the `config_path` variable.
 
 # Adding nodes
 To add a node to an existing cluster is as easy as adding it to the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) and running `install.yml` again.
