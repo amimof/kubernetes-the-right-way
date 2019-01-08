@@ -9,7 +9,7 @@
       "ipMasq": true,
       "ipam": {
         "type": "host-local",
-        "subnet": "10.19.0.0/16",
+        "subnet": "{{ cluster_cidr }}",
         "routes": [{"dst": "0.0.0.0/0"}]
       }
     },

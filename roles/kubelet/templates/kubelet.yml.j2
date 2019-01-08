@@ -12,8 +12,7 @@ authorization:
 clusterDomain: "cluster.local"
 clusterDNS:
   - "10.32.0.10"
-podCIDR: "10.19.0.0/16"
-resolvConf: "/run/systemd/resolve/resolv.conf"
+resolvConf: "/etc/resolv.conf"
 runtimeRequestTimeout: "15m"
 tlsCertFile: "/etc/kubernetes/pki/system:node:{{ inventory_hostname }}.pem"
 tlsPrivateKeyFile: "/etc/kubernetes/pki/system:node:{{ inventory_hostname }}-key.pem"
