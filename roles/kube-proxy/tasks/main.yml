@@ -39,17 +39,14 @@
     - "{{ cluster_config_path }}/pki/master/kube-proxy.pem"
     - "{{ cluster_config_path }}/pki/master/kube-proxy-key.pem"
 
-- name: Create kube-proxy kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority /etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig /etc/kubernetes/config/kube-proxy.kubeconfig"
-
-- name: set-credentials 
-  command: "kubectl config set-credentials system:kube-proxy --client-certificate /etc/kubernetes/pki/kube-proxy.pem --client-key /etc/kubernetes/pki/kube-proxy-key.pem --embed-certs=true --kubeconfig /etc/kubernetes/config/kube-proxy.kubeconfig"
- 
-- name: set-context
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-proxy --kubeconfig /etc/kubernetes/config/kube-proxy.kubeconfig"
- 
-- name: use-context
-  command: "kubectl config use-context default --kubeconfig /etc/kubernetes/config/kube-proxy.kubeconfig"
+- name: Create kubeconfig
+  template:
+    src: kube-proxy.kubeconfig
+    dest: "/etc/kubernetes/config/kube-proxy.kubeconfig"
+  vars:
+    certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
+    client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-proxy.pem') | b64encode }}"
+    client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-proxy-key.pem') | b64encode }}"
 
 - name: Copy kube-proxy config
   copy:

@@ -1,6 +1,7 @@
 ---
 - set_fact:
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    cluster_port: "{{ cluster_port | default('6443') }}"
 
 - set_fact:
     config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
@@ -38,22 +39,19 @@
     - "{{ cluster_config_path }}/pki/master/kube-scheduler.pem"
     - "{{ cluster_config_path }}/pki/master/kube-scheduler-key.pem"
 
+- name: Create kubeconfig
+  template:
+    src: kube-scheduler.kubeconfig
+    dest: "/etc/kubernetes/config/kube-scheduler.kubeconfig"
+  vars:
+    certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
+    client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-scheduler.pem') | b64encode }}"
+    client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-scheduler-key.pem') | b64encode }}"
+
 - name: Copy scheduler config
   copy:
     src: kube-scheduler.yml
     dest: /etc/kubernetes/config/
-
-- name: Create kube-scheduler kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority /etc/kubernetes/pki/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
-
-- name: set-credentials 
-  command: "kubectl config set-credentials system:kube-scheduler --client-certificate /etc/kubernetes/pki/kube-scheduler.pem --client-key /etc/kubernetes/pki/kube-scheduler-key.pem --embed-certs=true --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
-
-- name: set-context 
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-scheduler --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
-
-- name: use-context 
-  command: "kubectl config use-context default --kubeconfig /etc/kubernetes/config/kube-scheduler.kubeconfig"
 
 - name: Create systemd unit file
   template:
