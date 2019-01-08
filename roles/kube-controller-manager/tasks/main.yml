@@ -1,6 +1,7 @@
 ---
 - set_fact:
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    cluster_port: "{{ cluster_port | default('6443') }}"
     cluster_cidr: "{{ cluster_cidr | default('10.19.0.0/16') }}"
 
 - set_fact:
@@ -42,36 +43,14 @@
     - "{{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem"
     - "{{ cluster_config_path }}/pki/master/service-account-key.pem"
 
-- name: Create controller-manager kubeconfig
-  command: "kubectl config set-cluster kubernetes --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
-
-- name: set-credentials 
-  command: "kubectl config set-credentials system:kube-controller-manager --client-certificate {{ cluster_config_path }}/pki/master/kube-controller-manager.pem --client-key {{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem --embed-certs=true --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
-
-- name: set-context 
-  command: "kubectl config set-context default --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
-
-- name: use-context 
-  command: "kubectl config use-context default --kubeconfig {{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-  delegate_to: 127.0.0.1
-  run_once: True
-
-- name: Change file permission for kubeconfig
-  file:
-    path: "{{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-    mode: 0644
-  delegate_to: 127.0.0.1
-
-- name: Copy kubeconfig
-  copy:
-    src: "{{ cluster_config_path }}/kube-controller-manager.kubeconfig"
-    dest: /etc/kubernetes/config/kube-controller-manager.kubeconfig
+- name: Create kubeconfig
+  template:
+    src: kube-controller-manager.kubeconfig
+    dest: "/etc/kubernetes/config/kube-controller-manager.kubeconfig"
+  vars:
+    certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
+    client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-controller-manager.pem') | b64encode }}"
+    client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-controller-manager-key.pem') | b64encode }}"
 
 - name: Create systemd unit file
   template:
