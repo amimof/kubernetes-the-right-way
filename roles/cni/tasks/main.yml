@@ -1,4 +1,8 @@
 ---
+- set_fact:
+    cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    cluster_cidr: "{{ cluster_cidr | default('10.19.0.0/16') }}"
+
 - name: Ensure directories exist
   file:
     state: directory
