@@ -58,7 +58,7 @@ ansible-playbook -i inventory install.yml
 ``` 
 
 ## Installing additional plugins
-After installation, you will have a bare minimum cluster. This means no cluter network and DNS. Refer to the [kubernetes docs](https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy) for more info. The choice is up to you. If you're not sure which ones to use, just stick with `flannel` and `CoreDNS` and you'll be fine.
+After installation, you will have a bare minimum cluster. This means no cluster network or DNS. Refer to the [kubernetes docs](https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy) for more info. The choice is up to you. If you're not sure which ones to use, just stick with `flannel` and `CoreDNS` and you'll be fine.
 
 Install `flannel` onto the cluster
 ```
