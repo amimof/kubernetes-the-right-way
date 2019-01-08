@@ -1,23 +1,23 @@
-# - hosts: localhost
-#   connection: local
-#   roles:
-#     - kubectl
-#     - certificates
+- hosts: localhost
+  connection: local
+  roles:
+    - kubectl
+    - certificates
 
-# - hosts: etcd
-#   roles:
-#     - etcd
+- hosts: etcd
+  roles:
+    - etcd
 
 - hosts: masters
   roles:
-    #- kube-apiserver
+    - kube-apiserver
     - kube-controller-manager
-    #- kube-scheduler
+    - kube-scheduler
 
 - hosts: nodes
   roles:
-    #- cni
-    #- containerd
-    #- runc
-    #- kube-proxy
+    - cni
+    - containerd
+    - runc
+    - kube-proxy
     - kubelet
