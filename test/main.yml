@@ -113,6 +113,8 @@
 # Run Smoke tests
 - name: Smoke tests
   hosts: localhost
+  vars:
+    kubeconfig: '~/.ktrw/kube-master/kubeconfig'
   tasks:
 
     - name: Get kubectl
@@ -142,11 +144,11 @@
         validate_certs: no
         status_code: 200
 
-    - name: Verify nodes are ready
-      shell: "kubectl get nodes"
+    - name: Wait 60s for nodes to become ready
+      shell: "KUBECONFIG={{ kubeconfig }} kubectl get nodes"
       register: result
-      until: '"NotReady" not in result.stdout'
-      retries: 60
+      until: result.stdout.find("NotReady") == -1
+      retries: 30
       delay: 2
 
     - name: Get namespace

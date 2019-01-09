@@ -66,7 +66,7 @@ ansible-playbook -i inventory install.yml
 ```shell
 $ KUBECONFIG=~/.ktrw/<cluster_name>/kubeconfig kubectl version --short
 Client Version: v1.13.1
-Server Version: v1.11.2
+Server Version: v1.13.1
 ```
 
 ## Installing additional plugins
