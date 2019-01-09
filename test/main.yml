@@ -113,9 +113,20 @@
 # Run Smoke tests
 - name: Smoke tests
   hosts: localhost
-  vars:
-    kubeconfig: '~/.ktrw/kube-master/kubeconfig'
   tasks:
+
+    - set_fact:
+        cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+        config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
+
+    - set_fact:
+        cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
+
+    - set_fact:
+        cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
+
+    - set_fact:
+        kubeconfig: '{{ cluster_config_path }}/kubeconfig'
 
     - name: Get kubectl
       get_url:
