@@ -115,6 +115,25 @@
   hosts: localhost
   tasks:
 
+    - set_fact:
+        cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+        config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
+
+    - set_fact:
+        cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
+
+    - set_fact:
+        cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
+
+    - set_fact:
+        kubeconfig: '{{ cluster_config_path }}/kubeconfig'
+
+    - name: Get kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: 0755
+
     - name: Get IP address of kube-master container
       shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
       register: result
@@ -136,11 +155,11 @@
         validate_certs: no
         status_code: 200
 
-    - name: Verify nodes are ready
-      shell: "kubectl get nodes"
+    - name: Wait 60s for nodes to become ready
+      shell: "KUBECONFIG={{ kubeconfig }} kubectl get nodes"
       register: result
-      until: '"NotReady" not in result.stdout'
-      retries: 60
+      until: result.stdout.find("NotReady") == -1
+      retries: 30
       delay: 2
 
     - name: Get namespace
