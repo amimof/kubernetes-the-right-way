@@ -181,15 +181,11 @@
   args:
     executable: /bin/bash
 
-- name: Create admin kubeconfig
-  shell: "kubectl config set-cluster {{ cluster_name }} --certificate-authority {{ cluster_config_path }}/pki/master/ca.pem --embed-certs=true --server=https://{{ cluster_hostname }}:{{ cluster_port }} --kubeconfig ~/.kube/config"
-
-- name: set-credentials 
-  shell: "kubectl config set-credentials {{ cluster_name }} --client-certificate {{ cluster_config_path }}/pki/master/admin.pem --client-key {{ cluster_config_path }}/pki/master/admin-key.pem --embed-certs=true --kubeconfig ~/.kube/config"
-
-- name: set-context 
-  shell: "kubectl config set-context {{ cluster_name }} --cluster={{ cluster_name }} --user={{ cluster_name }} --kubeconfig ~/.kube/config"
-
-- name: use-context 
-  shell: "kubectl config use-context {{ cluster_name }} --kubeconfig ~/.kube/config"
-
+- name: Create kubeconfig
+  template:
+    src: admin.kubeconfig
+    dest: "{{ cluster_config_path }}/kubeconfig"
+  vars:
+    certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
+    client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/admin.pem') | b64encode }}"
+    client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/admin-key.pem') | b64encode }}"
