@@ -52,13 +52,22 @@ There are a few variables that you may set to further customize the deployment.
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
 
 # Deploying a cluster
-Configure an Ansible [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) file with the host groups `etcd`, `masters` and `nodes` and assign any host to their respective groups. Have a look at the [examples](https://github.com/amimof/kubernetes-the-right-way/tree/master/example). After you've defined an inventory, run the `install.yml` playbook. 
+Configure an Ansible [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) file with the host groups `etcd`, `masters` and `nodes` and assign any host to their respective groups. Have a look at the [examples](https://github.com/amimof/kubernetes-the-right-way/tree/master/example). 
 
 **Note!** If you plan on using `flannel` in your cluster, you must set `cluster_cidr=10.244.0.0/16` in the inventory.
 
-```
+- After you've defined an inventory, run the `install.yml` playbook
+
+```shell
 ansible-playbook -i inventory install.yml
-``` 
+```
+
+- Use the kubeconfig in `~/.ktrw/<cluster_name>/kubeconfig` to manage the cluster
+```shell
+$ KUBECONFIG=~/.ktrw/<cluster_name>/kubeconfig kubectl version --short
+Client Version: v1.13.1
+Server Version: v1.11.2
+```
 
 ## Installing additional plugins
 After installation, you will have a bare minimum cluster. This means no cluster network or DNS. Refer to the [kubernetes docs](https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy) for more info. The choice is up to you. If you're not sure which ones to use, just stick with `flannel` and `CoreDNS` and you'll be fine.

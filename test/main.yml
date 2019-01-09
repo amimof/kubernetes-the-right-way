@@ -115,6 +115,12 @@
   hosts: localhost
   tasks:
 
+    - name: Get kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: 0755
+
     - name: Get IP address of kube-master container
       shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
       register: result
