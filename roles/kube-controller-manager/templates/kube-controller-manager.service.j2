@@ -10,13 +10,11 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --cluster-signing-cert-file=/etc/kubernetes/pki/ca.pem \
   --cluster-signing-key-file=/etc/kubernetes/pki/ca-key.pem \
   --kubeconfig=/etc/kubernetes/config/kube-controller-manager.kubeconfig \
-  --leader-elect=true \
   --root-ca-file=/etc/kubernetes/pki/ca.pem \
   --service-account-private-key-file=/etc/kubernetes/pki/service-account-key.pem \
   --service-cluster-ip-range=10.32.0.0/24 \
   --use-service-account-credentials=true \
-  --allocate-node-cidrs=true \
-  --v=2
+  --allocate-node-cidrs=true
 Restart=on-failure
 RestartSec=5
 
