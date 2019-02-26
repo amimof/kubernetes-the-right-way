@@ -48,6 +48,7 @@ There are a few variables that you may set to further customize the deployment.
 | `cluster_port` 	| `False` 	| `6443` 	| The port number on which kube-apiserver listens on. 	|
 | `cluster_name` 	| `False` 	| `cluster_hostname.split('.')[0]` 	| The name of the cluster, used for identification in `kubectl`. Defaults to the first segment of the `cluster_hostname`. 	|
 | `cluster_cidr` 	| `False` 	| `10.19.0.0/16` 	| CIDR Range for Pods in cluster. This effectively sets the `--cluster-cidr` flag on `kube-controller-manager`.	|
+| `enable_admission_plugins` 	| `False` 	| 	| Sets the `--enable-admission-plugins` kube-apiserver argument. 	|
 | `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
 
