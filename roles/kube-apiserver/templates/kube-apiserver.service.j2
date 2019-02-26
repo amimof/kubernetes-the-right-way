@@ -6,7 +6,6 @@ Documentation=https://github.com/kubernetes/kubernetes
 ExecStart=/usr/local/bin/kube-apiserver \
   --advertise-address={{ ansible_default_ipv4.address }} \
   --allow-privileged=true \
-  --apiserver-count=3 \
   --audit-log-maxage=30 \
   --audit-log-maxbackup=3 \
   --audit-log-maxsize=100 \
@@ -19,24 +18,19 @@ ExecStart=/usr/local/bin/kube-apiserver \
 {% if enable_admission_plugins is defined %}
   --enable-admission-plugins={{ enable_admission_plugins }} \
 {% endif %}
-  --enable-swagger-ui=true \
   --etcd-cafile=/etc/etcd/pki/ca.pem \
   --etcd-certfile=/etc/etcd/pki/etcd.pem \
   --etcd-keyfile=/etc/etcd/pki/etcd-key.pem \
   --etcd-servers={% for h in groups['etcd'] %}https://{{ hostvars[h].ansible_default_ipv4.address }}:2379{% if not loop.last %},{% endif %}{% endfor %} \
-  --event-ttl=1h \
-  --experimental-encryption-provider-config=/etc/kubernetes/config/encryption-config.yml \
+  --encryption-provider-config=/etc/kubernetes/config/encryption-config.yml \
   --kubelet-certificate-authority=/etc/kubernetes/pki/ca.pem \
   --kubelet-client-certificate=/etc/kubernetes/pki/kubelet-peer.pem \
   --kubelet-client-key=/etc/kubernetes/pki/kubelet-peer-key.pem \
-  --kubelet-https=true \
   --runtime-config=api/all \
   --service-account-key-file=/etc/kubernetes/pki/service-account-key.pem \
   --service-cluster-ip-range=10.32.0.0/24 \
-  --service-node-port-range=30000-32767 \
   --tls-cert-file=/etc/kubernetes/pki/apiserver.pem \
-  --tls-private-key-file=/etc/kubernetes/pki/apiserver-key.pem \
-  --v=2
+  --tls-private-key-file=/etc/kubernetes/pki/apiserver-key.pem
 Restart=on-failure
 RestartSec=5
 
