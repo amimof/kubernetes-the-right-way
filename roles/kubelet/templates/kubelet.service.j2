@@ -9,11 +9,8 @@ ExecStart=/usr/local/bin/kubelet \
   --config=/etc/kubernetes/config/system:node:{{ inventory_hostname }}.yml \
   --container-runtime=remote \
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
-  --image-pull-progress-deadline=2m \
   --kubeconfig=/etc/kubernetes/config/system:node:{{ inventory_hostname }}.kubeconfig \
-  --network-plugin=cni \
-  --register-node=true \
-  --v=2
+  --network-plugin=cni
 Restart=on-failure
 RestartSec=5
 
