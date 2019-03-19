@@ -4,6 +4,9 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/kube-apiserver \
+{% for flag in flags_apiserver %}
+  --{{ flag }} \
+{% endfor %}
   --advertise-address={{ ansible_default_ipv4.address }} \
   --allow-privileged=true \
   --audit-log-maxage=30 \
@@ -15,9 +18,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --secure-port={{ cluster_port }} \
   --insecure-port=0 \
   --client-ca-file=/etc/kubernetes/pki/ca.pem \
-{% if enable_admission_plugins is defined %}
-  --enable-admission-plugins={{ enable_admission_plugins }} \
-{% endif %}
   --etcd-cafile=/etc/etcd/pki/ca.pem \
   --etcd-certfile=/etc/etcd/pki/etcd.pem \
   --etcd-keyfile=/etc/etcd/pki/etcd-key.pem \

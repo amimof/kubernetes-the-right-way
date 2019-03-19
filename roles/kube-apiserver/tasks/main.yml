@@ -2,6 +2,7 @@
 - set_fact:
     cluster_port: "{{ cluster_port | default('6443') }}"
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+    flags_apiserver: "{{ flags_apiserver | default([]) }}"
 
 - set_fact:
     config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
