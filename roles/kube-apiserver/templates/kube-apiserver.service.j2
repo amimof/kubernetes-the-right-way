@@ -15,9 +15,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --secure-port={{ cluster_port }} \
   --insecure-port=0 \
   --client-ca-file=/etc/kubernetes/pki/ca.pem \
-{% if enable_admission_plugins is defined %}
-  --enable-admission-plugins={{ enable_admission_plugins }} \
-{% endif %}
   --etcd-cafile=/etc/etcd/pki/ca.pem \
   --etcd-certfile=/etc/etcd/pki/etcd.pem \
   --etcd-keyfile=/etc/etcd/pki/etcd-key.pem \
@@ -30,7 +27,9 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --service-account-key-file=/etc/kubernetes/pki/service-account-key.pem \
   --service-cluster-ip-range=10.32.0.0/24 \
   --tls-cert-file=/etc/kubernetes/pki/apiserver.pem \
-  --tls-private-key-file=/etc/kubernetes/pki/apiserver-key.pem
+  --tls-private-key-file=/etc/kubernetes/pki/apiserver-key.pem{% for flag in flags_apiserver %} \
+  --{{ flag }}{% endfor %}
+
 Restart=on-failure
 RestartSec=5
 
