@@ -50,7 +50,7 @@ There are a few variables that you may set to further customize the deployment.
 | `cluster_cidr` 	| `False` 	| `10.19.0.0/16` 	| CIDR Range for Pods in cluster. This effectively sets the `--cluster-cidr` flag on `kube-controller-manager`.	|
 | `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
-| `flags_apiserver` 	| `False` 	| 	| Additional options to kube-apiserver as an array, for example: ['enable-admission-plugins=PodSecurityPolicy'] 	|
+| `flags_apiserver` 	| `False` 	| 	| Additional options to kube-apiserver as an array, for example: `['--enable-admission-plugins=PodSecurityPolicy']`. 	|
 
 # Deploying a cluster
 Configure an Ansible [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) file with the host groups `etcd`, `masters` and `nodes` and assign any host to their respective groups. Have a look at the [examples](https://github.com/amimof/kubernetes-the-right-way/tree/master/example). 
