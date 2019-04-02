@@ -154,6 +154,8 @@
         user: kube
         validate_certs: no
         status_code: 200
+        client_cert: "{{ cluster_config_path }}/pki/master/admin.pem"
+        client_key: "{{ cluster_config_path }}/pki/master/admin-key.pem"
 
     - name: Wait 60s for nodes to become ready
       shell: "KUBECONFIG={{ kubeconfig }} kubectl get nodes"
