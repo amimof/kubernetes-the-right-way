@@ -16,12 +16,12 @@
 
 - name: Download kube-controller-manager
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-controller-manager
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-controller-manager
     dest: /usr/local/bin/kube-controller-manager
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:1f9406b8fbb661f43e9b7d270467161e37f2882369030618aea8e59f0d147565
+    checksum: sha256:00386973f990bfd90fbd944a02111d0b92179ed7612414e1aa7f836dd177659e
 
 - name: Ensure directories exist
   file:

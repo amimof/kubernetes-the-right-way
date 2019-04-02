@@ -16,12 +16,12 @@
 
 - name: Download kube-apiserver
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-apiserver
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-apiserver
     dest: /usr/local/bin/kube-apiserver
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:0e5adc6d7dc00d923ef23ff6027d5d4668ade914aad0fbd2420e48c9cb24421c
+    checksum: sha256:6a27afb355a9dda9dddcdbe3c2d031a5c843036cdc2f453841992c111978e008
 
 - name: Ensure directories exist
   file:

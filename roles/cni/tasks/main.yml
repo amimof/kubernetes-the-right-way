@@ -14,7 +14,7 @@
 
 - name: Download cni
   unarchive:
-    src: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
+    src: https://github.com/containernetworking/plugins/releases/download/v0.7.5/cni-plugins-amd64-v0.7.5.tgz
     dest: /opt/cni/bin/
     remote_src: True
 
