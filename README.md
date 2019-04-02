@@ -66,8 +66,8 @@ ansible-playbook -i inventory install.yml
 - Use the kubeconfig in `~/.ktrw/<cluster_name>/kubeconfig` to manage the cluster
 ```shell
 $ KUBECONFIG=~/.ktrw/<cluster_name>/kubeconfig kubectl version --short
-Client Version: v1.13.1
-Server Version: v1.13.1
+Client Version: v1.14.0
+Server Version: v1.14.0
 ```
 
 ## Installing additional plugins
@@ -99,15 +99,15 @@ To add a node to an existing cluster is as easy as adding it to the [inventory](
 
 | Name                      | Version   | Role       |
 | ------------------------- | --------- | ---------- |
-| cni                       | 0.6.0     | node       |
-| containerd                | 1.2.1     | node       |
-| etcd                      | 3.3.9     | etcd       |
-| kube-apiserver            | 1.13.1    | master     |
-| kube-controller-manager   | 1.13.1    | master     |
-| kube-scheduler            | 1.13.1    | master     |
-| kube-proxy                | 1.13.1    | node       |
-| kubelet                   | 1.13.1    | node       |
-| kubectl                   | 1.13.1    | controller |
+| cni                       | 0.7.5     | node       |
+| containerd                | 1.2.5     | node       |
+| etcd                      | 3.3.12     | etcd       |
+| kube-apiserver            | 1.14.0    | master     |
+| kube-controller-manager   | 1.14.0    | master     |
+| kube-scheduler            | 1.14.0    | master     |
+| kube-proxy                | 1.14.0    | node       |
+| kubelet                   | 1.14.0    | node       |
+| kubectl                   | 1.14.0    | controller |
 | runc                      | 1.0.0-rc6 | node       |
 
 # How to contribute

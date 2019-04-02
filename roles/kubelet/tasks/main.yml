@@ -15,12 +15,12 @@
 
 - name: Download kubelet
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubelet
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kubelet
     dest: /usr/local/bin/kubelet
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:5d6c5872d314e6c551d8ec1617f94367756f93121ab6102d363f87e64d4998f6
+    checksum: sha256:bcd3ae191947e55de6ee9f47ff9f68a711149d20b46ca4342aac367ded4ffc85
 
 - name: Ensure directories exist
   file:
