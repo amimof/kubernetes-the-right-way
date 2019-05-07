@@ -1,16 +1,18 @@
-
 [plugins]
   [plugins.cri.containerd]
     snapshotter = "overlayfs"
     [plugins.cri.containerd.default_runtime]
       runtime_type = "io.containerd.runtime.v1.linux"
-      runtime_engine = "/usr/local/bin/runc"
-      runtime_root = ""
-    [plugins.cri.containerd.untrusted_workload_runtime]
+      [plugins.cri.containerd.default_runtime.options]
+        Runtime = "/usr/local/bin/runc"
+        RuntimeRoot = ""
+    [plugins.cri.containerd.runtimes.untrusted]
       runtime_type = "io.containerd.runtime.v1.linux"
-      runtime_engine = "/usr/local/bin/runsc"
-      runtime_root = "/run/containerd/runsc"
-    [plugins.cri.containerd.gvisor]
+      [plugins.cri.containerd.runtimes.untrusted.options]
+        BinaryName = "/usr/local/bin/runsc"
+        Root = "/run/containerd/runsc"
+    [plugins.cri.containerd.runtimes.gvisor]
       runtime_type = "io.containerd.runtime.v1.linux"
-      runtime_engine = "/usr/local/bin/runsc"
-      runtime_root = "/run/containerd/runsc"
+      [plugins.cri.containerd.runtimes.gvisor.options]
+        BinaryName = "/usr/local/bin/runsc"
+        Root = "/run/containerd/runsc"
