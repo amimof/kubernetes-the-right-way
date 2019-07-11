@@ -35,6 +35,8 @@
   with_items:
     - etcd
     - etcdctl
+  notify:
+    - restart etcd
 
 - name: Remove tmp download files
   file:
@@ -64,18 +66,20 @@
   copy:
     src: "{{ cluster_config_path }}/pki/etcd/"
     dest: /etc/etcd/pki
+  notify:
+    - restart etcd
 
 - name: Create systemd unit file
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
+  notify:
+    - restart etcd
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable etcd
-  systemd:
     name: etcd
-    state: restarted
     enabled: True
+    daemon_reload: True
+  notify:
+    - restart etcd
