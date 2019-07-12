@@ -12,23 +12,25 @@
     src: https://github.com/containerd/containerd/releases/download/v1.2.5/containerd-1.2.5.linux-amd64.tar.gz
     dest: /usr/local/
     remote_src: True
+  notify:
+    - restart containerd
 
 - name: Create configuration
   template:
     src: config.toml.j2
     dest: /etc/containerd/config.toml
+  notify:
+    - restart containerd    
 
 - name: Create systemd unit file
   template:
     src: containerd.service.j2
     dest: /etc/systemd/system/containerd.service
+  notify:
+    - restart containerd
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable containerd
-  systemd:
     name: containerd
-    state: restarted
+    daemon_reload: True
     enabled: True

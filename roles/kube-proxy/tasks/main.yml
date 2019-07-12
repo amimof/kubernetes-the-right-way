@@ -21,6 +21,8 @@
     owner: root
     group: root
     checksum: sha256:c374b63498f6be40f37a34bc77603e40ceba2fac0f06e1296a0065538f3a31de
+  notify:
+    - restart kube-proxy
 
 - name: Ensure directories exist
   file:
@@ -39,6 +41,8 @@
     - "{{ cluster_config_path }}/pki/master/ca.pem"
     - "{{ cluster_config_path }}/pki/master/kube-proxy.pem"
     - "{{ cluster_config_path }}/pki/master/kube-proxy-key.pem"
+  notify:
+    - restart kube-proxy
 
 - name: Create kubeconfig
   template:
@@ -48,23 +52,27 @@
     certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
     client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-proxy.pem') | b64encode }}"
     client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-proxy-key.pem') | b64encode }}"
+  notify:
+    - restart kube-proxy
 
 - name: Copy kube-proxy config
   copy:
     src: kube-proxy.yml
     dest: /etc/kubernetes/config/
+  notify:
+    - restart kube-proxy
 
 - name: Create systemd unit file
   template:
     src: kube-proxy.service.j2
     dest: /etc/systemd/system/kube-proxy.service
+  notify:
+    - restart kube-proxy
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable kube-proxy
-  systemd:
     name: kube-proxy
-    state: restarted
+    daemon_reload: True
     enabled: True
+  notify:
+    - restart kube-proxy

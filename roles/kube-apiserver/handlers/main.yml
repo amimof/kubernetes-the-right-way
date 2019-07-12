@@ -1,0 +1,12 @@
+---
+- name: restart kube-apiserver
+  systemd:
+    name: kube-apiserver
+    state: restarted
+  notify:
+  - wait until kube-apiserver is up
+
+- name: wait until kube-apiserver is up
+  wait_for:
+    port: "{{ cluster_port }}"
+    delay: 3

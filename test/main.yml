@@ -21,7 +21,9 @@
           ipv4_address: 172.19.0.2
       etc_hosts:
         kube-master: 172.19.0.3
-        kube-node1: 172.19.0.4
+        kube-node01: 172.19.0.4
+        kube-node02: 172.19.0.5
+        kube-node03: 172.19.0.6
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
@@ -36,24 +38,27 @@
           ipv4_address: 172.19.0.3
       etc_hosts:
         etcd: 172.19.0.2
-        kube-node1: 172.19.0.4
+        kube-node01: 172.19.0.4
+        kube-node02: 172.19.0.5
+        kube-node03: 172.19.0.6
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
   - name: Bring up nodes
     docker_container:
-      name: kube-node1
+      name: "{{ 'kube-node%02d' | format(item)}}"
       image: 'centos/systemd:latest'
       privileged: yes
-      hostname: kube-node1
+      hostname: "{{ 'kube-node%02d' | format(item) }}"
       etc_hosts:
         etcd: 172.19.0.2
         kube-master: 172.19.0.3
       networks:
         - name: docker_test_net
-          ipv4_address: 172.19.0.4
+          ipv4_address: "{{ '172.19.0.%d' | format(3+item) }}"
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    loop: "{{ range(1, 3+1, 1) | list }}"
         
 # Compose the inventory 
 - hosts: localhost
@@ -86,7 +91,9 @@
         ansible_become: yes
       with_items:
         - kube-master
-        - kube-node1
+        - kube-node01
+        - kube-node02
+        - kube-node03
 
 # Install required packages
 - hosts: etcd,masters,nodes

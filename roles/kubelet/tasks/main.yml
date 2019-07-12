@@ -21,6 +21,8 @@
     owner: root
     group: root
     checksum: sha256:c9f08323107a960b9ce075f1bee116dc9cedf7a5faea54e96ecfaf6399f6e5a3
+  notify:
+    - restart kubelet
 
 - name: Ensure directories exist
   file:
@@ -38,6 +40,8 @@
   with_fileglob:
     - "{{ cluster_config_path }}/pki/node/system:node:{{ inventory_hostname }}*"
     - "{{ cluster_config_path }}/pki/master/ca.pem"
+  notify:
+    - restart kubelet
 
 - name: Create kubeconfig
   template:
@@ -47,23 +51,27 @@
     certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
     client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/node/system:node:'+inventory_hostname+'.pem') | b64encode }}"
     client_key_data: "{{ lookup('file', cluster_config_path+'/pki/node/system:node:'+inventory_hostname+'-key.pem') | b64encode }}"
+  notify:
+    - restart kubelet
 
 - name: Create kubelet config
   template:
     src: kubelet.yml.j2
     dest: "/etc/kubernetes/config/system:node:{{ inventory_hostname }}.yml"
+  notify:
+    - restart kubelet
 
 - name: Create systemd unit file
   template:
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
+  notify:
+    - restart kubelet
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable kubelet
-  systemd:
     name: kubelet
-    state: restarted
+    daemon_reload: True
     enabled: True
+  notify:
+    - restart kubelet

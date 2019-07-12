@@ -1,22 +1,22 @@
 - hosts: localhost
   connection: local
   roles:
-    - certificates
+  - certificates
 
 - hosts: etcd
   roles:
-    - etcd
+  - etcd
 
 - hosts: masters
   roles:
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-scheduler
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
 
 - hosts: nodes
   roles:
-    - cni
-    - containerd
-    - runc
-    - kube-proxy
-    - kubelet
+  - cni
+  - containerd
+  - runc
+  - kube-proxy
+  - kubelet

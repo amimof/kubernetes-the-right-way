@@ -1,0 +1,12 @@
+---
+- name: restart etcd
+  systemd:
+    name: etcd
+    state: restarted
+  notify:
+  - wait until etcd is up
+
+- name: wait until etcd is up
+  wait_for:
+    port: 2379
+    delay: 3

@@ -1,0 +1,12 @@
+---
+- name: restart kube-proxy
+  systemd:
+    name: kube-proxy
+    state: restarted
+  notify:
+  - wait until kube-proxy is up
+
+- name: wait until kube-proxy is up
+  wait_for:
+    port: 10256
+    delay: 3
