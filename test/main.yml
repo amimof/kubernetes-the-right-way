@@ -7,8 +7,8 @@
     docker_network:
       name: docker_test_net
       ipam_config:
-        subnet: '172.19.0.0/16'
-        gateway: 172.19.0.1
+        - subnet: '172.19.0.0/16'
+          gateway: 172.19.0.1
 
   - name: Bring up etcd
     docker_container:
