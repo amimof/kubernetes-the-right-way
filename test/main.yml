@@ -21,7 +21,9 @@
           ipv4_address: 172.19.0.2
       etc_hosts:
         kube-master: 172.19.0.3
-        kube-node1: 172.19.0.4
+        kube-node01: 172.19.0.4
+        kube-node02: 172.19.0.5
+        kube-node03: 172.19.0.6
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
@@ -36,24 +38,27 @@
           ipv4_address: 172.19.0.3
       etc_hosts:
         etcd: 172.19.0.2
-        kube-node1: 172.19.0.4
+        kube-node01: 172.19.0.4
+        kube-node02: 172.19.0.5
+        kube-node03: 172.19.0.6
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
   - name: Bring up nodes
     docker_container:
-      name: kube-node1
+      name: "{{ 'kube-node%02d' | format(item)}}"
       image: 'centos/systemd:latest'
       privileged: yes
-      hostname: kube-node1
+      hostname: "{{ 'kube-node%02d' | format(item) }}"
       etc_hosts:
         etcd: 172.19.0.2
         kube-master: 172.19.0.3
       networks:
         - name: docker_test_net
-          ipv4_address: 172.19.0.4
+          ipv4_address: "{{ '172.19.0.%d' | format(3+item) }}"
       volumes:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    loop: "{{ range(1, 3+1, 1) | list }}"
         
 # Compose the inventory 
 - hosts: localhost
@@ -86,7 +91,9 @@
         ansible_become: yes
       with_items:
         - kube-master
-        - kube-node1
+        - kube-node01
+        - kube-node02
+        - kube-node03
 
 # Install required packages
 - hosts: etcd,masters,nodes
@@ -110,88 +117,88 @@
 - name: Run install.yml
   import_playbook: ../install.yml
 
-# Run Smoke tests
-- name: Smoke tests
-  hosts: localhost
-  tasks:
+# # Run Smoke tests
+# - name: Smoke tests
+#   hosts: localhost
+#   tasks:
 
-    - set_fact:
-        cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
-        config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
+#     - set_fact:
+#         cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
+#         config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
 
-    - set_fact:
-        cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
+#     - set_fact:
+#         cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
 
-    - set_fact:
-        cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
+#     - set_fact:
+#         cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
 
-    - set_fact:
-        kubeconfig: '{{ cluster_config_path }}/kubeconfig'
+#     - set_fact:
+#         kubeconfig: '{{ cluster_config_path }}/kubeconfig'
 
-    - name: Get kubectl
-      get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.14.1/bin/linux/amd64/kubectl
-        dest: /usr/local/bin/kubectl
-        mode: 0755
+#     - name: Get kubectl
+#       get_url:
+#         url: https://storage.googleapis.com/kubernetes-release/release/v1.14.1/bin/linux/amd64/kubectl
+#         dest: /usr/local/bin/kubectl
+#         mode: 0755
 
-    - name: Get IP address of kube-master container
-      shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
-      register: result
+#     - name: Get IP address of kube-master container
+#       shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
+#       register: result
 
-    - name: Add kube-master to /etc/hosts
-      become: True
-      lineinfile:
-        path: /etc/hosts
-        regexp: '^.*kube-master'
-        line: "{{ result.stdout }} kube-master"
-        owner: root
-        group: root
-        mode: 0644
+#     - name: Add kube-master to /etc/hosts
+#       become: True
+#       lineinfile:
+#         path: /etc/hosts
+#         regexp: '^.*kube-master'
+#         line: "{{ result.stdout }} kube-master"
+#         owner: root
+#         group: root
+#         mode: 0644
 
-    - name: Verify kube-apiserver 
-      uri:
-        url: "https://kube-master:6443/api/v1"
-        user: kube
-        validate_certs: no
-        status_code: 200
-        client_cert: "{{ cluster_config_path }}/pki/master/admin.pem"
-        client_key: "{{ cluster_config_path }}/pki/master/admin-key.pem"
+#     - name: Verify kube-apiserver 
+#       uri:
+#         url: "https://kube-master:6443/api/v1"
+#         user: kube
+#         validate_certs: no
+#         status_code: 200
+#         client_cert: "{{ cluster_config_path }}/pki/master/admin.pem"
+#         client_key: "{{ cluster_config_path }}/pki/master/admin-key.pem"
 
-    - name: Wait 60s for nodes to become ready
-      shell: "KUBECONFIG={{ kubeconfig }} kubectl get nodes"
-      register: result
-      until: result.stdout.find("NotReady") == -1
-      retries: 30
-      delay: 2
+#     - name: Wait 60s for nodes to become ready
+#       shell: "KUBECONFIG={{ kubeconfig }} kubectl get nodes"
+#       register: result
+#       until: result.stdout.find("NotReady") == -1
+#       retries: 30
+#       delay: 2
 
-    - name: Get namespace
-      shell: "kubectl get namespace ktrw-tests"
-      register: result
-      ignore_errors: True
-      no_log: True
+#     - name: Get namespace
+#       shell: "kubectl get namespace ktrw-tests"
+#       register: result
+#       ignore_errors: True
+#       no_log: True
 
-    - name: Create namespace
-      shell: "kubectl create ns ktrw-tests"
-      when: '"NotFound" in result.stderr'
+#     - name: Create namespace
+#       shell: "kubectl create ns ktrw-tests"
+#       when: '"NotFound" in result.stderr'
 
-# Run cleanup.yml
-- name: Run cleanup.yml
-  import_playbook: ../cleanup.yml
+# # Run cleanup.yml
+# - name: Run cleanup.yml
+#   import_playbook: ../cleanup.yml
 
-# Cleanup tests
-- hosts: localhost
-  tasks:
-  - name: Stop and remove containers
-    docker_container:
-      name: "{{ item }}"
-      image: 'centos/systemd:latest'
-      state: stopped
-    with_items:
-      - etcd
-      - kube-master
-      - kube-node1
+# # Cleanup tests
+# - hosts: localhost
+#   tasks:
+#   - name: Stop and remove containers
+#     docker_container:
+#       name: "{{ item }}"
+#       image: 'centos/systemd:latest'
+#       state: stopped
+#     with_items:
+#       - etcd
+#       - kube-master
+#       - kube-node1
 
-  - name: Remove network
-    docker_network:
-      name: docker_test_net
-      state: absent
+#   - name: Remove network
+#     docker_network:
+#       name: docker_test_net
+#       state: absent
