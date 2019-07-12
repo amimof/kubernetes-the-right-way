@@ -1,4 +1,9 @@
 ---
+- setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: True
+  with_items: "{{ groups['etcd'] }}"
+
 - set_fact:
     cluster_port: "{{ cluster_port | default('6443') }}"
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
