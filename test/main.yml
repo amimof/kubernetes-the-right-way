@@ -12,10 +12,10 @@
 
   - name: Bring up etcd
     docker_container:
-      name: etcd
+      name: etcd01
       image: 'centos/systemd:latest'
       privileged: yes
-      hostname: etcd
+      hostname: etcd01
       networks:
         - name: docker_test_net
           ipv4_address: 172.19.0.2
@@ -39,7 +39,7 @@
           ipv4_address: 172.19.0.3
       networks_cli_compatible: yes
       etc_hosts:
-        etcd: 172.19.0.2
+        etcd01: 172.19.0.2
         kube-node01: 172.19.0.4
         kube-node02: 172.19.0.5
         kube-node03: 172.19.0.6
@@ -53,7 +53,7 @@
       privileged: yes
       hostname: "{{ 'kube-node%02d' | format(item) }}"
       etc_hosts:
-        etcd: 172.19.0.2
+        etcd01: 172.19.0.2
         kube-master: 172.19.0.3
       networks:
         - name: docker_test_net
@@ -68,7 +68,7 @@
   tasks:
     - name: Group etcd
       add_host:
-        name: etcd
+        name: etcd01
         groups: etcd
         ansible_connection: docker
         ansible_ssh_user: root
@@ -197,9 +197,11 @@
       image: 'centos/systemd:latest'
       state: stopped
     with_items:
-      - etcd
+      - etcd01
       - kube-master
-      - kube-node1
+      - kube-node01
+      - kube-node02
+      - kube-node03
 
   - name: Remove network
     docker_network:
