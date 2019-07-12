@@ -4,16 +4,19 @@
   - certificates
 
 - hosts: etcd
+  serial: "{{ serial_etcd | default(serial_all | default(-1)) }}"
   roles:
   - etcd
 
 - hosts: masters
+  serial: "{{ serial_masters | default(serial_all | default(-1)) }}"
   roles:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler
 
 - hosts: nodes
+  serial: "{{ serial_nodes | default(serial_all | default(-1)) }}"
   roles:
   - cni
   - containerd

@@ -95,6 +95,22 @@ During installation private certificates, public certificates and configuration 
 # Adding nodes
 To add a node to an existing cluster is as easy as adding it to the [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) and running `install.yml` again.
 
+# Rolling upgrades
+When making changes to your cluster you might want to make sure that no more than X hosts are down at the same time. There are four Ansible variables that control this, which must be set with the `--extra-vars` switch:
+
+* `serial_etcd` controls how many hosts of type `etcd` will be handled at a time
+* `serial_masters` controls how many hosts of type `masters` will be handled at a time
+* `serial_nodes` controls how many hosts of type `nodes` will be handled at a time
+* `serial_all` controls how many hosts of a single type will be handled at a time, given that the specific one above for that type is **not** specified
+
+The default value of these variables is `-1`, indicating that everything should be executed in parallell. A value of `1` would indicate that only one host at a time will be processed. A value of `50%` indicates that half of the hosts (rounded downwards) will be handled at a time, which effectively means that for example 1/3 or 2/5 will be handled at a time.
+
+Example:
+
+```
+$ ansible-playbook --inventory ansible-inventory --extra-vars "serial_all=50%" install.yml
+```
+
 # Version matrix
 
 | Name                      | Version   | Role       |

@@ -19,4 +19,4 @@ install:
 
 script:
   - ansible-playbook test/main.yml --syntax-check
-  - ansible-playbook -b test/main.yml
+  - ansible-playbook -b -e "serial_all=50%" test/main.yml
