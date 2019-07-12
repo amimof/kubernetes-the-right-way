@@ -22,6 +22,8 @@
     owner: root
     group: root
     checksum: sha256:a6028a53751ba1a9e85de094b4cc45d1971a7e339267f456b366664acee0f30f
+  notify:
+    - restart kube-controller-manager
 
 - name: Ensure directories exist
   file:
@@ -42,6 +44,8 @@
     - "{{ cluster_config_path }}/pki/master/kube-controller-manager.pem"
     - "{{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem"
     - "{{ cluster_config_path }}/pki/master/service-account-key.pem"
+  notify:
+    - restart kube-controller-manager
 
 - name: Create kubeconfig
   template:
@@ -51,18 +55,20 @@
     certificate_authority_data: "{{ lookup('file', cluster_config_path+'/pki/master/ca.pem') | b64encode }}"
     client_certificate_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-controller-manager.pem') | b64encode }}"
     client_key_data: "{{ lookup('file', cluster_config_path+'/pki/master/kube-controller-manager-key.pem') | b64encode }}"
+  notify:
+    - restart kube-controller-manager    
 
 - name: Create systemd unit file
   template:
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service
+  notify:
+    - restart kube-controller-manager
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable kube-controller-manager
-  systemd:
     name: kube-controller-manager
-    state: restarted
+    daemon_reload: True
     enabled: True
+  notify:
+    - restart kube-controller-manager
