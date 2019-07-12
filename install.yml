@@ -4,8 +4,6 @@
   - certificates
 
 - hosts: etcd
-  vars:
-    skip_etcd_handlers: True
   roles:
   - etcd
 
@@ -22,10 +20,3 @@
   - runc
   - kube-proxy
   - kubelet
-
-- hosts: etcd,masters
-  serial: 1
-  vars:
-    skip_etcd_handlers: False
-  tasks:
-  - import_tasks: roles/etcd/handlers/main.yml
