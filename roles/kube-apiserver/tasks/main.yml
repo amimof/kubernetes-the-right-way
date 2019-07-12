@@ -22,6 +22,8 @@
     owner: root
     group: root
     checksum: sha256:1ce67dda7b125dc1adadc10ab93fe339f6ce40211ae4f1552d6de177e36a430d
+  notify:
+    - restart kube-apiserver
 
 - name: Ensure directories exist
   file:
@@ -43,6 +45,8 @@
     - "{{ cluster_config_path }}/pki/master/apiserver-key.pem"
     - "{{ cluster_config_path }}/pki/master/kubelet-peer.pem"
     - "{{ cluster_config_path }}/pki/master/kubelet-peer-key.pem"
+  notify:
+    - restart kube-apiserver
 
 - name: Ensure directories exist
   file:
@@ -60,23 +64,27 @@
     - "{{ cluster_config_path }}/pki/etcd/ca.pem"
     - "{{ cluster_config_path }}/pki/etcd/etcd.pem"
     - "{{ cluster_config_path }}/pki/etcd/etcd-key.pem"
+  notify:
+    - restart kube-apiserver
 
 - name: Copy encryption-config
   copy:
     src: encryption-config.yml
     dest: /etc/kubernetes/config
+  notify:
+    - restart kube-apiserver
 
 - name: Create systemd unit file
   template:
     src: kube-apiserver.service.j2
     dest: /etc/systemd/system/kube-apiserver.service
+  notify:
+    - restart kube-apiserver
 
 - name: daemon-reload
   systemd: 
-    daemon_reload: True
-
-- name: Start and enable kube-apiserver
-  systemd:
     name: kube-apiserver
-    state: restarted
+    daemon_reload: True
     enabled: True
+  notify:
+    - restart kube-apiserver
