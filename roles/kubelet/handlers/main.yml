@@ -1,0 +1,12 @@
+---
+- name: restart kubelet
+  systemd:
+    name: kubelet
+    state: restarted
+  notify:
+  - wait until kubelet is up
+
+- name: wait until kubelet is up
+  wait_for:
+    port: 10250
+    delay: 3
