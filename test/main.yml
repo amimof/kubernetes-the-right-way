@@ -145,7 +145,7 @@
         mode: 0755
 
     - name: Get IP address of kube-master container
-      shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' kube-master"
+      shell: "docker inspect --format '{''{ .NetworkSettings.Networks.docker_test_net.IPAddress }''}' kube-master"
       register: result
 
     - name: Add kube-master to /etc/hosts
