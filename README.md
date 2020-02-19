@@ -113,17 +113,17 @@ $ ansible-playbook --inventory ansible-inventory --extra-vars "serial_all=50%" i
 
 # Version matrix
 
-| Name                      | Version   | Role       |
-| ------------------------- | --------- | ---------- |
-| cni                       | 0.7.5     | node       |
-| containerd                | 1.2.5     | node       |
-| etcd                      | 3.3.12    | etcd       |
-| kube-apiserver            | 1.14.4    | master     |
-| kube-controller-manager   | 1.14.4    | master     |
-| kube-scheduler            | 1.14.4    | master     |
-| kube-proxy                | 1.14.4    | node       |
-| kubelet                   | 1.14.4    | node       |
-| runc                      | 1.0.0-rc6 | node       |
+| Name                      | Version    | Role       |
+| ------------------------- | ---------- | ---------- |
+| cni                       | 0.7.5      | node       |
+| containerd                | 1.3.3      | node       |
+| etcd                      | 3.3.12     | etcd       |
+| kube-apiserver            | 1.14.4     | master     |
+| kube-controller-manager   | 1.14.4     | master     |
+| kube-scheduler            | 1.14.4     | master     |
+| kube-proxy                | 1.14.4     | node       |
+| kubelet                   | 1.14.4     | node       |
+| runc                      | 1.0.0-rc10 | node       |
 
 # How to contribute
 This project is MIT licensed and accepts contributions via GitHub pull requests.
