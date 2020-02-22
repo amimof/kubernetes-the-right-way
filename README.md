@@ -50,6 +50,7 @@ There are a few variables that you may set to further customize the deployment.
 | `cluster_cidr` 	| `False` 	| `10.19.0.0/16` 	| CIDR Range for Pods in cluster. This effectively sets the `--cluster-cidr` flag on `kube-controller-manager`.	|
 | `regenerate_certificates` 	| `False` 	| `False` 	| Set to True to force create certificates. This will overwrite existing certificates. 	|
 | `regenerate_keys` 	| `False` 	| `False` 	| Set to True to force create private certificates (keys). This will overwrite existing certificates. 	|
+| `certificate_expiry` 	| `False` 	| `1826` 	| Number of days until cluster certificates expires and need to be renewed.	|
 | `flags_apiserver` 	| `False` 	| 	| Additional options to kube-apiserver as an array, for example: `['--enable-admission-plugins=PodSecurityPolicy']`. 	|
 
 # Deploying a cluster

@@ -11,6 +11,8 @@
     config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
     regenerate_certificates: "{{ regenerate_certificates | default(False) }}"
     regenerate_keys: "{{ regenerate_keys | default(False) }}"
+    certificate_expiry: "{{ certificate_expiry | default(1826) }}"
+
 
 - set_fact:
     cluster_name: "{{ cluster_name | default(cluster_hostname.split('.')[0] | default('kubernetes')) }}"
@@ -72,7 +74,7 @@
     path: "{{ cluster_config_path }}/pki/master/ca.pem"
   register: result
 - name: Generate CA cert
-  shell: "openssl req -x509 -new -sha256 -nodes -key {{ cluster_config_path }}/pki/master/ca-key.pem -days 1826 -out {{ cluster_config_path }}/pki/master/ca.pem -subj '/CN=kubernetes-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -x509 -new -sha256 -nodes -key {{ cluster_config_path }}/pki/master/ca-key.pem -days {{ certificate_expiry }} -out {{ cluster_config_path }}/pki/master/ca.pem -subj '/CN=kubernetes-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # etcd CA certificate
@@ -80,7 +82,7 @@
     path: "{{ cluster_config_path }}/pki/etcd/ca.pem"
   register: result
 - name: Generate etcd CA cert
-  shell: "openssl req -x509 -new -sha256 -nodes -key {{ cluster_config_path }}/pki/etcd/ca-key.pem -days 1826 -out {{ cluster_config_path }}/pki/etcd/ca.pem -subj '/CN=etcd-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -x509 -new -sha256 -nodes -key {{ cluster_config_path }}/pki/etcd/ca-key.pem -days {{ certificate_expiry }} -out {{ cluster_config_path }}/pki/etcd/ca.pem -subj '/CN=etcd-ca/C=SE/L=Gothenburg/O=Kubernetes/OU=CA/ST=Vastra Gotalands Lan' -extensions v3_ca -config {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # kube-apiserver certificates
@@ -88,7 +90,7 @@
     path: "{{ cluster_config_path }}/pki/master/apiserver.pem"
   register: result
 - name: Generate apiserver cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/apiserver-key.pem -subj '/CN=kube-apiserver/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/apiserver.pem -days 1826 -extensions v3_req_apiserver -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/apiserver-key.pem -subj '/CN=kube-apiserver/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/apiserver.pem -days {{ certificate_expiry }} -extensions v3_req_apiserver -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # kubelet peer certificates
@@ -96,7 +98,7 @@
     path: "{{ cluster_config_path }}/pki/master/kubelet-peer.pem"
   register: result
 - name: Generate kubelet-peer cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kubelet-peer-key.pem -subj '/CN=kubelet-peer/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kubelet-peer.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kubelet-peer-key.pem -subj '/CN=kubelet-peer/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kubelet-peer.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # Admin certificates
@@ -104,7 +106,7 @@
     path: "{{ cluster_config_path }}/pki/master/admin.pem"
   register: result
 - name: Generate admin cert
-  shell: "openssl req -new -key {{ cluster_config_path }}/pki/master/admin-key.pem -subj '/CN=Kubernetes/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/admin.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -key {{ cluster_config_path }}/pki/master/admin-key.pem -subj '/CN=Kubernetes/C=SE/L=Gothenburg/O=system:masters/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/admin.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # kube-controller-manage certificates
@@ -112,7 +114,7 @@
     path: "{{ cluster_config_path }}/pki/master/kube-controller-manager.pem"
   register: result
 - name: Generate kube-controller-manager cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem -subj '/CN=system:kube-controller-manager/C=SE/L=Gothenburg/O=system:kube-controller-manager/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-controller-manager.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-controller-manager-key.pem -subj '/CN=system:kube-controller-manager/C=SE/L=Gothenburg/O=system:kube-controller-manager/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-controller-manager.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # kube-scheduler certificates
@@ -120,7 +122,7 @@
     path: "{{ cluster_config_path }}/pki/master/kube-scheduler.pem"
   register: result
 - name: Generate kube-scheduler cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-scheduler-key.pem -subj '/CN=system:kube-scheduler/C=SE/L=Gothenburg/O=system:kube-scheduler/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-scheduler.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-scheduler-key.pem -subj '/CN=system:kube-scheduler/C=SE/L=Gothenburg/O=system:kube-scheduler/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-scheduler.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # kube-proxy certificates
@@ -128,7 +130,7 @@
     path: "{{ cluster_config_path }}/pki/master/kube-proxy.pem"
   register: result
 - name: Generate kube-proxy cert 
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-proxy-key.pem -subj '/CN=system:kube-proxy/C=SE/L=Gothenburg/O=system:node-proxier/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-proxy.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/kube-proxy-key.pem -subj '/CN=system:kube-proxy/C=SE/L=Gothenburg/O=system:node-proxier/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/kube-proxy.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # service-account certificates
@@ -136,7 +138,7 @@
     path: "{{ cluster_config_path }}/pki/master/service-account.pem"
   register: result
 - name: Generate service-account cert 
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/service-account-key.pem -subj '/CN=service-accounts/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/service-account.pem -days 1826 -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/master/service-account-key.pem -subj '/CN=service-accounts/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/master/service-account.pem -days {{ certificate_expiry }} -extensions v3_req_client -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # etcd certificates
@@ -144,7 +146,7 @@
     path: "{{ cluster_config_path }}/pki/etcd/etcd.pem"
   register: result
 - name: Generate etcd cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/etcd/etcd-key.pem -subj '/CN=etcd/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/etcd/ca.pem -CAkey {{ cluster_config_path }}/pki/etcd/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/etcd/etcd.pem -days 1826 -extensions v3_req_etcd -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/etcd/etcd-key.pem -subj '/CN=etcd/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/etcd/ca.pem -CAkey {{ cluster_config_path }}/pki/etcd/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/etcd/etcd.pem -days {{ certificate_expiry }} -extensions v3_req_etcd -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 # etcd-peer certificates
@@ -152,7 +154,7 @@
     path: "{{ cluster_config_path }}/pki/etcd/peer.pem"
   register: result
 - name: Generate etcd-peer cert
-  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/etcd/peer-key.pem -subj '/CN=etcd-peer/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/etcd/ca.pem -CAkey {{ cluster_config_path }}/pki/etcd/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/etcd/peer.pem -days 1826 -extensions v3_req_etcd -extfile {{ cluster_config_path }}/config/openssl.conf"
+  shell: "openssl req -new -sha256 -key {{ cluster_config_path }}/pki/etcd/peer-key.pem -subj '/CN=etcd-peer/C=SE/L=Gothenburg/O=Kubernetes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/etcd/ca.pem -CAkey {{ cluster_config_path }}/pki/etcd/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/etcd/peer.pem -days {{ certificate_expiry }} -extensions v3_req_etcd -extfile {{ cluster_config_path }}/config/openssl.conf"
   when: not result.stat.exists or regenerate_certificates
 
 - name: Generate node private keys
@@ -175,7 +177,7 @@
   register: result
   with_items: "{{ groups['nodes'] }}"
 - name: Generate node certs
-  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days 1826 -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ hostvars[item.1].ansible_default_ipv4.address }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
+  shell: "openssl req -new -key {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}-key.pem -subj '/CN=system:node:{{ hostvars[item.1].inventory_hostname_short }}/C=SE/L=Gothenburg/O=system:nodes/OU=amimof/ST=Vastra Gotalands Lan' | openssl x509 -req -sha256 -CA {{ cluster_config_path }}/pki/master/ca.pem -CAkey {{ cluster_config_path }}/pki/master/ca-key.pem -CAcreateserial -out {{ cluster_config_path }}/pki/node/system:node:{{ item.1 }}.pem -days {{ certificate_expiry }} -extfile <(printf 'subjectAltName=DNS.1:{{ hostvars[item.1].inventory_hostname_short }},DNS.2:{{ hostvars[item.1].inventory_hostname }},IP.1:{{ hostvars[item.1].ansible_default_ipv4.address }}\nbasicConstraints=CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth,serverAuth')"
   with_indexed_items: "{{ groups['nodes'] }}"
   when: not result.results[item.0].stat.exists or regenerate_certificates
   args:
