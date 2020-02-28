@@ -15,12 +15,12 @@
 
 - name: Download kube-proxy
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.15.10/bin/linux/amd64/kube-proxy
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.16.7/bin/linux/amd64/kube-proxy
     dest: /usr/local/bin/kube-proxy
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:6ceb07b1a3680ee5e77cb5f7750e49b9e44493c47cd4b2643bd71af1585f6bed
+    checksum: sha256:a96c8ff94252e6d5ac4ce84e5ce6933e9a7f61fc0f11ac7a21297f45e149831b
   notify:
     - restart kube-proxy
 
