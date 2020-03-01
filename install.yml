@@ -20,6 +20,7 @@
   roles:
   - cni
   - containerd
+  - crictl
   - runc
   - kube-proxy
   - kubelet

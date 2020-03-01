@@ -118,6 +118,7 @@ $ ansible-playbook --inventory ansible-inventory --extra-vars "serial_all=50%" i
 | ------------------------- | ---------- | ---------- |
 | cni                       | 0.7.5      | node       |
 | containerd                | 1.3.3      | node       |
+| crictl                    | 1.16.1     | node       |
 | etcd                      | 3.3.12     | etcd       |
 | kube-apiserver            | 1.15.10    | master     |
 | kube-controller-manager   | 1.15.10    | master     |

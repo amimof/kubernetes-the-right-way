@@ -1,0 +1,32 @@
+- name: Download crictl
+  get_url:
+    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.1/crictl-v1.16.1-linux-amd64.tar.gz
+    dest: /tmp/crictl-v1.16.1-linux-amd64.tar.gz
+    mode: 0755
+    owner: root
+    group: root
+    checksum: sha256:19fed421710fccfe58f5573383bb137c19438a9056355556f1a15da8d23b3ad1
+
+- name: Unarchive crictl tarball
+  unarchive:
+    src: /tmp/crictl-v1.16.1-linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: True
+
+- name: Move crictl binary into place
+  copy:
+    src: /tmp/crictl
+    dest: /usr/local/bin/crictl
+    remote_src: True
+
+- name: Remove tmp download files
+  file:
+    path: /tmp/crictl
+    state: absent
+
+- name: Make crictl binaries executable
+  file:
+    path: /usr/local/bin/crictl
+    owner: root
+    group: root
+    mode: 0755
