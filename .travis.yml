@@ -1,5 +1,5 @@
 sudo: required
-dist: stretch
+dist: xenial
 language: python
 python:
   - "2.7"
