@@ -103,7 +103,7 @@
   tasks:
 
     - yum:
-        name: ['iproute', 'libseccomp', 'libseccomp-devel', 'conntrack']
+        name: ['iproute', 'libseccomp', 'libseccomp-devel', 'conntrack', 'sudo']
         state: present
 
     - name: Remove swapfile from /etc/fstab
