@@ -15,12 +15,12 @@
     
 - name: Download kube-scheduler
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.16.7/bin/linux/amd64/kube-scheduler
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.16.13/bin/linux/amd64/kube-scheduler
     dest: /usr/local/bin/kube-scheduler
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:a05d8c8dde761dd0d1bea17e57bc30b27cd34de9b5ee36d82cad4584e46e1219
+    checksum: sha256:6aed00d41867e17d6d602b623fa6f9cb5e72ba26386087f8221b3b292a7b039e
   notify:
     - restart kube-scheduler
 
