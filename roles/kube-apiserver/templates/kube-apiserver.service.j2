@@ -13,7 +13,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --authorization-mode=Node,RBAC \
   --bind-address=0.0.0.0 \
   --secure-port={{ cluster_port }} \
-  --insecure-port=0 \
   --client-ca-file=/etc/kubernetes/pki/ca.pem \
   --etcd-cafile=/etc/etcd/pki/ca.pem \
   --etcd-certfile=/etc/etcd/pki/etcd.pem \
