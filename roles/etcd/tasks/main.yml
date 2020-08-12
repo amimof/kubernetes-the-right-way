@@ -19,22 +19,22 @@
 
 - name: Download etcd
   get_url:
-    url: https://github.com/etcd-io/etcd/releases/download/v3.3.15/etcd-v3.3.15-linux-amd64.tar.gz
-    dest: /tmp/etcd-v3.3.15-linux-amd64.tar.gz
+    url: https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-linux-amd64.tar.gz
+    dest: /tmp/etcd-v3.4.3-linux-amd64.tar.gz
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:87e30dc472a48b775a9e764cb742a5df0a2844e7b82d12917d7ea489febbc8c8
+    checksum: sha256:6c642b723a86941b99753dff6c00b26d3b033209b15ee33325dc8e7f4cd68f07
 
 - name: Unarchive etcd tarball
   unarchive:
-    src: /tmp/etcd-v3.3.15-linux-amd64.tar.gz
+    src: /tmp/etcd-v3.4.3-linux-amd64.tar.gz
     dest: /tmp
     remote_src: True
 
 - name: Move etcd binaries into place
   copy:
-    src: "/tmp/etcd-v3.3.15-linux-amd64/{{ item }}"
+    src: "/tmp/etcd-v3.4.3-linux-amd64/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     remote_src: True
   with_items:
@@ -48,8 +48,8 @@
     path: "/tmp/{{ item }}"
     state: absent
   with_items:
-    - etcd-v3.3.15-linux-amd64
-    - etcd-v3.3.15-linux-amd64.tar.gz
+    - etcd-v3.4.3-linux-amd64
+    - etcd-v3.4.3-linux-amd64.tar.gz
 
 - name: Make etcd binaries executable
   file:

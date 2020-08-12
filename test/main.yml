@@ -140,7 +140,7 @@
 
     - name: Get kubectl
       get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.16.13/bin/linux/amd64/kubectl
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.17.9/bin/linux/amd64/kubectl
         dest: /usr/local/bin/kubectl
         mode: 0755
 

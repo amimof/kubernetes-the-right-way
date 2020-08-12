@@ -22,7 +22,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --kubelet-certificate-authority=/etc/kubernetes/pki/ca.pem \
   --kubelet-client-certificate=/etc/kubernetes/pki/kubelet-peer.pem \
   --kubelet-client-key=/etc/kubernetes/pki/kubelet-peer-key.pem \
-  --runtime-config=api/all \
+  --runtime-config=api/all=true \
   --service-account-key-file=/etc/kubernetes/pki/service-account-key.pem \
   --service-cluster-ip-range=10.32.0.0/24 \
   --tls-cert-file=/etc/kubernetes/pki/apiserver.pem \

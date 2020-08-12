@@ -16,12 +16,12 @@
 
 - name: Download kube-controller-manager
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.16.13/bin/linux/amd64/kube-controller-manager
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.17.9/bin/linux/amd64/kube-controller-manager
     dest: /usr/local/bin/kube-controller-manager
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:2d57d0c3a351260d1d3cd1843189a49a09aca7e7905c90b2c08b4165d1171b5e
+    checksum: sha256:936cb7aaf00453a11793772c2fad6b4ee56da4470afc8f1263516f3744fe2262
   notify:
     - restart kube-controller-manager
 
