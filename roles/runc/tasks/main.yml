@@ -1,9 +1,9 @@
 ---
 - name: Download runc
   get_url:
-    url: https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.amd64
+    url: https://github.com/opencontainers/runc/releases/download/v1.0.0-rc93/runc.amd64
     dest: /usr/local/bin/runc
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:0fec6929f8675aa7530a7920498e8910365cc9f2867e9a31d2129defd96aa489
+    checksum: sha256:9feaa82be15cb190cf0ed76fcb6d22841abd18088d275a47e894cd1e3a0ee4b6

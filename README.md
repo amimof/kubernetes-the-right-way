@@ -67,8 +67,8 @@ ansible-playbook -i inventory install.yml
 - Use the kubeconfig in `~/.ktrw/<cluster_name>/kubeconfig` to manage the cluster
 ```shell
 $ KUBECONFIG=~/.ktrw/<cluster_name>/kubeconfig kubectl version --short
-Client Version: v1.16.13
-Server Version: v1.16.13
+Client Version: v1.19.8
+Server Version: v1.19.8
 ```
 
 ## Installing additional plugins
@@ -116,16 +116,16 @@ $ ansible-playbook --inventory ansible-inventory --extra-vars "serial_all=50%" i
 
 | Name                      | Version    | Role       |
 | ------------------------- | ---------- | ---------- |
-| cni                       | 0.7.5      | node       |
+| cni                       | 0.8.7      | node       |
 | containerd                | 1.3.3      | node       |
-| crictl                    | 1.16.1     | node       |
-| etcd                      | 3.3.15     | etcd       |
-| kube-apiserver            | 1.16.13    | master     |
-| kube-controller-manager   | 1.16.13    | master     |
-| kube-scheduler            | 1.16.13    | master     |
-| kube-proxy                | 1.16.13    | node       |
-| kubelet                   | 1.16.13    | node       |
-| runc                      | 1.0.0-rc10 | node       |
+| crictl                    | 1.19.0     | node       |
+| etcd                      | 3.4.13     | etcd       |
+| kube-apiserver            | 1.19.8     | master     |
+| kube-controller-manager   | 1.19.8     | master     |
+| kube-scheduler            | 1.19.8     | master     |
+| kube-proxy                | 1.19.8     | node       |
+| kubelet                   | 1.19.8     | node       |
+| runc                      | 1.0.0-rc93 | node       |
 
 # How to contribute
 This project is MIT licensed and accepts contributions via GitHub pull requests.
