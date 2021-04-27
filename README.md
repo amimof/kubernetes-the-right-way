@@ -11,7 +11,7 @@ Install a [Kubernetes](https://kubernetes.io/) cluster with [Ansible](https://ww
 This project aims to provide an automated way of deploying a Kubernetes cluster that isn't configured. This means that configuration and host preparations lies in the hands of the user executing the playbooks. After a successfull install you will have a cluster with:
 * [containerd](https://github.com/containerd/containerd) as container runtime
 * [runc](https://github.com/opencontainers/runc) for managing containers
-* [cni](https://github.com/containernetworking/cni) plugins
+* [cni plugins](https://github.com/containernetworking/plugins)
 * one or more [etcd](https://github.com/etcd-io/etcd) instances
 * one or more masters (kube-api, kube-controller-manager, kube-scheduler) installed as services managed by systemd.
 * one or more nodes (kubelet)
@@ -67,8 +67,8 @@ ansible-playbook -i inventory install.yml
 - Use the kubeconfig in `~/.ktrw/<cluster_name>/kubeconfig` to manage the cluster
 ```shell
 $ KUBECONFIG=~/.ktrw/<cluster_name>/kubeconfig kubectl version --short
-Client Version: v1.19.8
-Server Version: v1.19.8
+Client Version: v1.20.6
+Server Version: v1.20.6
 ```
 
 ## Installing additional plugins
@@ -116,15 +116,15 @@ $ ansible-playbook --inventory ansible-inventory --extra-vars "serial_all=50%" i
 
 | Name                      | Version    | Role       |
 | ------------------------- | ---------- | ---------- |
-| cni                       | 0.8.7      | node       |
-| containerd                | 1.3.3      | node       |
-| crictl                    | 1.19.0     | node       |
+| cni plugins               | 0.8.7      | node       |
+| containerd                | 1.4.1      | node       |
+| crictl                    | 1.20.0     | node       |
 | etcd                      | 3.4.13     | etcd       |
-| kube-apiserver            | 1.19.8     | master     |
-| kube-controller-manager   | 1.19.8     | master     |
-| kube-scheduler            | 1.19.8     | master     |
-| kube-proxy                | 1.19.8     | node       |
-| kubelet                   | 1.19.8     | node       |
+| kube-apiserver            | 1.20.6     | master     |
+| kube-controller-manager   | 1.20.6     | master     |
+| kube-scheduler            | 1.20.6     | master     |
+| kube-proxy                | 1.20.6     | node       |
+| kubelet                   | 1.20.6     | node       |
 | runc                      | 1.0.0-rc93 | node       |
 
 # How to contribute

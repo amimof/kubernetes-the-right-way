@@ -21,12 +21,12 @@
 
 - name: Download kube-apiserver
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.19.8/bin/linux/amd64/kube-apiserver
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kube-apiserver
     dest: /usr/local/bin/kube-apiserver
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:c75948a13379f700306f2a3cbf73d6c636f7bf6725d31dfab73086fa98407851
+    checksum: sha256:17f64a9d27676599075dfa4580326b364137fb10b6949791d257e511d5b7c601
   notify:
     - restart kube-apiserver
 
@@ -45,6 +45,7 @@
     dest: /etc/kubernetes/pki
   with_items:
     - "{{ cluster_config_path }}/pki/master/ca.pem"
+    - "{{ cluster_config_path }}/pki/master/service-account.pem"
     - "{{ cluster_config_path }}/pki/master/service-account-key.pem"
     - "{{ cluster_config_path }}/pki/master/apiserver.pem"
     - "{{ cluster_config_path }}/pki/master/apiserver-key.pem"
