@@ -9,7 +9,7 @@
 
 - name: Download containerd
   unarchive:
-    src: https://github.com/containerd/containerd/releases/download/v1.4.1/containerd-1.4.1-linux-amd64.tar.gz
+    src: https://github.com/containerd/containerd/releases/download/v1.6.12/containerd-1.6.12-linux-amd64.tar.gz
     dest: /usr/local/
     remote_src: True
   notify:

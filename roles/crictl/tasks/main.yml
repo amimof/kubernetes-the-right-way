@@ -1,15 +1,15 @@
 - name: Download crictl
   get_url:
-    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.20.0/crictl-v1.20.0-linux-amd64.tar.gz
-    dest: /tmp/crictl-v1.20.0-linux-amd64.tar.gz
+    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.25.0/crictl-v1.25.0-linux-amd64.tar.gz
+    dest: /tmp/crictl-v1.25.0-linux-amd64.tar.gz
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:44d5f550ef3f41f9b53155906e0229ffdbee4b19452b4df540265e29572b899c
+    checksum: sha256:86ab210c007f521ac4cdcbcf0ae3fb2e10923e65f16de83e0e1db191a07f0235
 
 - name: Unarchive crictl tarball
   unarchive:
-    src: /tmp/crictl-v1.20.0-linux-amd64.tar.gz
+    src: /tmp/crictl-v1.25.0-linux-amd64.tar.gz
     dest: /tmp
     remote_src: True
 

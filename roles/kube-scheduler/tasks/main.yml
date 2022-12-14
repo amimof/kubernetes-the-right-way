@@ -12,15 +12,15 @@
 
 - set_fact:
     cluster_config_path: "{{ config_path }}/{{ cluster_name }}"
-    
+
 - name: Download kube-scheduler
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kube-scheduler
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.25.5/bin/linux/amd64/kube-scheduler
     dest: /usr/local/bin/kube-scheduler
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:1ff832c70d5597b5ffda1d63a737855d93cde7d1233b1afb69bcd3df027b16e6
+    checksum: sha256:72146943b4310ef8ccab16a195fd2a916feebafdac2bf6544db747fc2419254f
   notify:
     - restart kube-scheduler
 

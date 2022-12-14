@@ -15,12 +15,12 @@
 
 - name: Download kubelet
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kubelet
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.25.5/bin/linux/amd64/kubelet
     dest: /usr/local/bin/kubelet
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:7688a663dd06222d337c8fdb5b05e1d9377e6d64aa048c6acf484bc3f2a596a8
+    checksum: sha256:n16b23e1254830805b892cfccf2687eb3edb4ea54ffbadb8cc2eee6d3b1fab8e6
   notify:
     - restart kubelet
 
