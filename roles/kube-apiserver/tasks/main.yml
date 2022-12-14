@@ -21,12 +21,12 @@
 
 - name: Download kube-apiserver
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kube-apiserver
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.25.5/bin/linux/amd64/kube-apiserver
     dest: /usr/local/bin/kube-apiserver
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:17f64a9d27676599075dfa4580326b364137fb10b6949791d257e511d5b7c601
+    checksum: sha256:c0ff83a8a499fbefade288411a09250c92bbb234f9961c6d7787d4ef702e6a5c
   notify:
     - restart kube-apiserver
 

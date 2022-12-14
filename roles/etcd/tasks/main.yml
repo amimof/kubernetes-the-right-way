@@ -6,7 +6,7 @@
 
 - set_fact:
     cluster_hostname: "{{ cluster_hostname | default(groups['masters'][0]) }}"
-    
+
 - set_fact:
     config_path: "{{ config_path | default(lookup('env','HOME')+'/.ktrw') }}"
   delegate_to: 127.0.0.1
@@ -19,22 +19,22 @@
 
 - name: Download etcd
   get_url:
-    url: https://github.com/etcd-io/etcd/releases/download/v3.4.13/etcd-v3.4.13-linux-amd64.tar.gz
-    dest: /tmp/etcd-v3.4.13-linux-amd64.tar.gz
+    url: https://github.com/etcd-io/etcd/releases/download/v3.5.6/etcd-v3.5.6-linux-amd64.tar.gz
+    dest: /tmp/etcd-v3.5.6-linux-amd64.tar.gz
     mode: 0755
     owner: root
     group: root
-    checksum: sha256:2ac029e47bab752dacdb7b30032f230f49e2f457cbc32e8f555c2210bb5ff107
+    checksum: sha256:4db32e3bc06dd0999e2171f76a87c1cffed8369475ec7aa7abee9023635670fb
 
 - name: Unarchive etcd tarball
   unarchive:
-    src: /tmp/etcd-v3.4.13-linux-amd64.tar.gz
+    src: /tmp/etcd-v3.5.6-linux-amd64.tar.gz
     dest: /tmp
     remote_src: True
 
 - name: Move etcd binaries into place
   copy:
-    src: "/tmp/etcd-v3.4.13-linux-amd64/{{ item }}"
+    src: "/tmp/etcd-v3.5.6-linux-amd64/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     remote_src: True
   with_items:
@@ -48,8 +48,8 @@
     path: "/tmp/{{ item }}"
     state: absent
   with_items:
-    - etcd-v3.4.13-linux-amd64
-    - etcd-v3.4.13-linux-amd64.tar.gz
+    - etcd-v3.5.6-linux-amd64
+    - etcd-v3.5.6-linux-amd64.tar.gz
 
 - name: Make etcd binaries executable
   file:
@@ -60,7 +60,7 @@
   with_items:
     - etcd
     - etcdctl
-    
+
 - name: Ensure directories exist
   file:
     state: directory
